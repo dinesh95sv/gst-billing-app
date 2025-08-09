@@ -1,0 +1,77 @@
+import { registerRootComponent } from 'expo';
+import { ExpoRoot } from 'expo-router';
+import React, { useEffect } from 'react';
+import * as MediaLibrary from 'expo-media-library';
+import { Platform } from 'react-native';
+import { database } from './db/database';
+
+// Must be exported or Fast Refresh won't update the context
+export function App() {
+  const ctx = require.context('./app');
+  useEffect(() => {
+    (async () => {
+      await requestStoragePermission();
+      await initialiseDummyData();
+    })();
+  }, []);
+
+  const requestStoragePermission = async () => {
+    if (Platform.OS === 'android') {
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      console.log(status === 'granted'
+        ? '✅ Storage permission granted' 
+        : '⚠️ Storage permission denied');
+    }
+  };
+
+  const initialiseDummyData = async () => {
+    const productsCollection = database.collections.get('products');
+    const customersCollection = database.collections.get('customers');
+    const factoriesCollection = database.collections.get('factories');
+    const invoicesCollection = database.collections.get('invoices');
+
+    const existing = await productsCollection.query().fetch();
+    if (existing.length === 0) {
+      await database.write(async () => {
+        const product = await productsCollection.create(p => {
+          p.name = 'Dummy Product';
+          p.hsn = '1234';
+          p.price = 100;
+          p.gst_percent = 18;
+        });
+        const customer = await customersCollection.create(c => {
+          c.name = 'John Doe';
+          c.address = '123 Demo Street';
+          c.phone = '9876543210';
+          c.email = 'johndoe@example.com';
+          c.gstin = '22AAAAA0000A1Z5';
+        });
+        const factory = await factoriesCollection.create(f => {
+          f.name = 'Demo Factory';
+          f.address = 'Industrial Area, City';
+          f.contact = 'Factory Contact';
+          f.gstin = '33BBBBB1111B2Z6';
+        });
+        await invoicesCollection.create(inv => {
+          inv.invoice_number = 'INV-1000';
+          inv.date = new Date().toISOString().split('T')[0];
+          inv.customer_id = customer.id;
+          inv.factory_id = factory.id;
+          inv.items_json = JSON.stringify([{ 
+            name: product.name, 
+            quantity: 2, 
+            price: product.price, 
+            gstPercent: product.gst_percent, 
+            total: 236 
+          }]);
+          inv.gst_breakup = 36;
+          inv.total = 236;
+        });
+      });
+      console.log('✅ Dummy data added');
+    }
+  };
+  return <ExpoRoot context={ctx} />;
+}
+
+registerRootComponent(App);
