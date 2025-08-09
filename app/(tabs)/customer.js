@@ -20,31 +20,47 @@ function CustomersScreenBase({ customers }) {
   };
 
   return (
-    <View style={styles.container}>
-      <ScrollView>
-        <Text style={styles.title}>Customer List</Text>
-        {customers.map(cust => (
-          <View key={cust.id} style={styles.card}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.name}>{cust.name}</Text>
-              <Text>GSTIN: {cust.gstin}</Text>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scrollView}>
+          <Text style={styles.title}>Customer List</Text>
+          {customers.map(cust => (
+            <View key={cust.id} style={styles.card}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.name}>{cust.name}</Text>
+                <Text>GSTIN: {cust.gstin}</Text>
+              </View>
+              <View style={styles.actions}>
+                <TouchableOpacity 
+                  style={styles.actionBtn} 
+                  onPress={() => { setEditingCustomer(cust); setModalVisible(true); }}
+                >
+                  <Text style={styles.actionText}>Edit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.actionBtn} 
+                  onPress={() => handleDelete(cust)}
+                >
+                  <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <View>
-              <TouchableOpacity onPress={() => { setEditingCustomer(cust); setModalVisible(true); }}>
-                <Text>Edit</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDelete(cust)}>
-                <Text>Delete</Text>
-              </TouchableOpacity>
-            </View>
+          ))}
+          {/* <Button title="➕ Add Customer" onPress={() => { setEditingCustomer(null); setModalVisible(true); }} /> */}
+        </ScrollView>
+        <View style={styles.btnContainer}>
+            <TouchableOpacity
+              style={styles.btnPrimary} 
+              onPress={() => { setEditingCustomer(null); setModalVisible(true); }}
+            >
+              <Text style={styles.label}>Add Customer</Text>
+            </TouchableOpacity>
           </View>
-        ))}
-        <Button title="➕ Add Customer" onPress={() => { setEditingCustomer(null); setModalVisible(true); }} />
-      </ScrollView>
-      <Modal visible={modalVisible}>
-        <CustomerForm existingCustomer={editingCustomer} onClose={() => setModalVisible(false)} />
-      </Modal>
-    </View>
+        <Modal visible={modalVisible}>
+          <CustomerForm existingCustomer={editingCustomer} onClose={() => setModalVisible(false)} />
+        </Modal>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
@@ -54,8 +70,30 @@ const enhance = withObservables([], () => ({
 export default enhance(CustomersScreenBase);
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 12, backgroundColor:'#ddd' },
+  container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
+  scrollView: { flex: 1, alignItems: 'baseline' },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
-  card: { padding: 10, backgroundColor: '#eee', marginBottom: 10, borderRadius: 6 },
-  name: { fontWeight: 'bold' }
+  card: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#f7f7f7', 
+    padding: 10, 
+    marginVertical: 5, 
+    border: '.5px solid #ddd', 
+    borderRadius: 6 
+  },
+  name: { fontWeight: 'bold', fontSize: 16 },
+  actions: { justifyContent: 'center', alignItems: 'flex-end' },
+  actionBtn: { paddingVertical: 4, paddingHorizontal: 8 },
+  actionText: { color: 'blue', fontWeight: '500' },
+  btnContainer: { display: 'flex', alignItems: 'flex-end', justifyContent: 'right' },
+  btnPrimary: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#39e39f',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 8,
+  },
 });
