@@ -54,7 +54,7 @@ const enhance = withObservables([], () => ({
 export default enhance(CustomersScreenBase);
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 12 },
+  container: { flex: 1, padding: 12, backgroundColor:'#ddd' },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   card: { padding: 10, backgroundColor: '#eee', marginBottom: 10, borderRadius: 6 },
   name: { fontWeight: 'bold' }

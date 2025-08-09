@@ -82,7 +82,7 @@ const enhance = withObservables([], () => ({
 export default enhance(FactoriesScreenBase);
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 12, backgroundColor: '#fff' },
+  container: { flex: 1, padding: 12, backgroundColor: '#ddd' },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   card: { 
     flexDirection: 'row', 

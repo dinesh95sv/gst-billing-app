@@ -33,11 +33,11 @@ export default function ProductForm({ existingProduct, onClose }) {
     <View style={styles.container}>
       <TextInput placeholder="Product Name" value={name} onChangeText={setName} style={styles.input} />
       <TextInput placeholder="HSN" value={hsn} onChangeText={setHsn} style={styles.input} />
-      <TextInput placeholder="Price" keyboardType="numeric" value={price} onChangeText={setPrice} style={styles.input} />
-      <TextInput placeholder="GST %" keyboardType="numeric" value={gstPercent} onChangeText={setGstPercent} style={styles.input} />
+      <TextInput placeholder="Price" inputMode="decimal" value={price} onChangeText={setPrice} style={styles.input} />
+      <TextInput placeholder="GST %" inputMode="numeric" value={gstPercent} onChangeText={setGstPercent} style={styles.input} />
       <Button title="Save" onPress={saveProduct} />
       <Button title="Cancel" onPress={onClose} color="grey" />
     </View>
   );
 }
-const styles = StyleSheet.create({ container:{padding:20}, input:{borderWidth:1,borderColor:'#ccc',marginBottom:10,padding:8,borderRadius:5} });
+const styles = StyleSheet.create({ container:{padding:20, backgroundColor:'#ddd'}, input:{borderWidth:1,borderColor:'#ccc',marginBottom:10,padding:8,borderRadius:5} });

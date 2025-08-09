@@ -26,7 +26,7 @@ function ProductsScreenBase({ products }) {
             <View style={{ flex:1 }}>
               <Text style={styles.name}>{prod.name}</Text>
               <Text>HSN: {prod.hsn}</Text>
-              <Text>₹{prod.price} + {prod.gst_percent}% GST</Text>
+              <Text>₹{prod.price} + {prod.gstPercent}% GST</Text>
             </View>
             <View>
               <TouchableOpacity onPress={() => { setEditing(prod); setModalVisible(true); }}>
@@ -50,4 +50,4 @@ const enhance = withObservables([], () => ({
   products: database.collections.get('products').query().observe()
 }));
 export default enhance(ProductsScreenBase);
-const styles = StyleSheet.create({container:{flex:1,padding:12}, title:{fontSize:20,fontWeight:'bold'}, card:{backgroundColor:'#eee',padding:10,marginVertical:5,borderRadius:5},name:{fontWeight:'bold'}});
+const styles = StyleSheet.create({container:{flex:1, padding:12, backgroundColor:'#ddd'}, title:{fontSize:20,fontWeight:'bold'}, card:{backgroundColor:'#eee',padding:10,marginVertical:5,borderRadius:5},name:{fontWeight:'bold'}});

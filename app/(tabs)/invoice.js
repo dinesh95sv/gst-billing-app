@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Button, Alert, Modal, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
+import {useNavigation} from '@react-navigation/native';
 import { withObservables } from '@nozbe/watermelondb/react';
 import { database } from '../../db/database';
 // import InvoiceForm from '../../components/InvoiceForm';
@@ -8,7 +8,7 @@ import { generateInvoicePDF } from '../../utils/pdfGenerator';
 import * as Sharing from 'expo-sharing';
 
 function InvoicesScreenBase({ invoices }) {
-  const router = useRouter();
+  const navigation = useNavigation();
 
   // const [modalVisible, setModalVisible] = React.useState(false);
   // const [editing, setEditing] = React.useState(null);
@@ -29,16 +29,9 @@ function InvoicesScreenBase({ invoices }) {
 
   const redirectToCreateInvoice = (inv) => {
     if (inv != null) {
-      router.replace({
-        pathname: '/index',
-        params: {
-          existingInvoice: inv,
-        }
-      })
+      navigation.navigate('index', {existingInvoice: inv});
     } else {
-      router.replace({
-        pathname: '/index',
-      });
+      navigation.navigate('index');
     }
   }
 
@@ -49,7 +42,7 @@ function InvoicesScreenBase({ invoices }) {
         {invoices.map(inv => (
           <View key={inv.id} style={styles.card}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.name}>{inv.invoice_number}</Text>
+              <Text style={styles.name}>{inv.invoiceNumber}</Text>
               <Text>Date: {inv.date}</Text>
               <Text>Total: ₹{inv.total.toFixed(2)}</Text>
             </View>
@@ -78,7 +71,7 @@ const enhance = withObservables([], () => ({
 export default enhance(InvoicesScreenBase);
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 12 },
+  container: { flex: 1, padding: 12, backgroundColor:'#ddd' },
   title: { fontSize: 20, fontWeight: 'bold' },
   card: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#eee', padding: 10, marginVertical: 5, borderRadius: 5 },
   name: { fontWeight: 'bold' }

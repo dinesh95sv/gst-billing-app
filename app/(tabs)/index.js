@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, TextInput, StyleSheet, FlatList } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import { database } from '../../db/database';
-import { useRouter } from 'expo-router';
 
 export default function InvoiceForm({ existingInvoice }) {
-  const router = useRouter();
+  const navigation = useNavigation();
   const [customers, setCustomers] = useState([]);
   const [factories, setFactories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -46,9 +46,7 @@ export default function InvoiceForm({ existingInvoice }) {
   }
 
   const onClose = () => {
-    router.replace({
-      pathname: '/invoices',
-    })
+    navigation.navigate('invoice');
   }
 
   const saveInvoice = async () => {
@@ -132,7 +130,7 @@ export default function InvoiceForm({ existingInvoice }) {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
+  container: { flex: 1, padding: 20, backgroundColor:'#ddd' },
   label: { fontWeight: 'bold', marginTop: 10 },
   input: { borderWidth: 1, borderColor: '#ccc', padding: 6, borderRadius: 4, marginBottom: 10 },
   itemRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 5 },

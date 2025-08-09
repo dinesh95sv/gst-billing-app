@@ -33,11 +33,11 @@ export default function FactoryForm({ existingFactory, onClose }) {
     <View style={styles.container}>
       <TextInput placeholder="Name" value={name} onChangeText={setName} style={styles.input} />
       <TextInput placeholder="Address" value={address} onChangeText={setAddress} style={styles.input} />
-      <TextInput placeholder="Contact" value={contact} onChangeText={setContact} style={styles.input} />
+      <TextInput placeholder="Contact" value={contact} inputMode="numeric" maxLength={10} onChangeText={setContact} style={styles.input} />
       <TextInput placeholder="GSTIN" value={gstin} onChangeText={setGstin} style={styles.input} />
       <Button title="Save" onPress={saveFactory} />
       <Button title="Cancel" onPress={onClose} color="grey" />
     </View>
   );
 }
-const styles = StyleSheet.create({ container:{padding:20}, input:{borderWidth:1,borderColor:'#ccc',marginBottom:10,padding:8,borderRadius:5} });
+const styles = StyleSheet.create({ container:{padding:20, backgroundColor:'#ddd'}, input:{borderWidth:1,borderColor:'#ccc',marginBottom:10,padding:8,borderRadius:5} });
