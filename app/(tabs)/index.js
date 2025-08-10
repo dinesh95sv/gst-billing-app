@@ -1,18 +1,20 @@
 // app/screens/CreateInvoiceScreen.js
-import { withObservables } from '@nozbe/watermelondb/react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button, Picker, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { RefreshControl } from 'react-native-gesture-handler';
 import { database } from '../../db/database';
 import { showToast } from '../../utils/utils';
 
-function CreateInvoiceScreenBase({ customers, factories, products }) {
+function CreateInvoiceScreenBase() {
   const navigation = useNavigation();
   const route = useRoute();
   const existingInvoice = route?.params?.existingInvoice || null;
 
-  const [showProductList, setShowProductList] = useState(false);
+  const [customers, setCustomers] = useState([]);
+  const [factories, setFactories] = useState([]);
+  const [products, setProducts] = useState([]);
+  // const [showProductList, setShowProductList] = useState(false);
 
   const [customerId, setCustomerId] = useState(existingInvoice?.customer_id || '');
   const [factoryId, setFactoryId] = useState(existingInvoice?.factory_id || '');
@@ -25,23 +27,58 @@ function CreateInvoiceScreenBase({ customers, factories, products }) {
     if (!factories.find(f => f.id === factoryId)) setFactoryId('');
   }, [customers, factories]);
 
-  const addProductToInvoice = (product) => {
-    const exists = items.find(i => i.productId === product.id);
-    if (!exists) {
-      setItems([
-        ...items, 
-        {
-          productId: product.id,
-          name: product.name,
-          hsn: product.hsn,
-          price: product.price,
-          gstPercent: product.gst_percent,
-          quantity: 1,
-          total: product.price + (product.price * product.gst_percent / 100)
-        }
-      ]);
+  useEffect(() => {
+    const loadData = async () => {
+      const  recFactoriesData = await database.get('factories').query().fetch();
+      const  recCustomersData = await database.get('customers').query().fetch();
+      const  recProductsData = await database.get('products').query().fetch();
+
+      setFactories(recFactoriesData);
+      setCustomers(recCustomersData);
+      setProducts(recProductsData);
     }
-    setShowProductList(false);
+    loadData();
+
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    const loadData = async () => {
+      const  recFactoriesData = await database.get('factories').query().fetch();
+      const  recCustomersData = await database.get('customers').query().fetch();
+      const  recProductsData = await database.get('products').query().fetch();
+
+      setFactories(recFactoriesData);
+      setCustomers(recCustomersData);
+      setProducts(recProductsData);
+    }
+    loadData();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
+  const addProductToInvoice = (productId) => {
+    const exists = items.find(i => i.productId === productId);
+    if (!exists) {
+      const product = products.find(i => i.id === productId) || {};
+      if (product) {
+        setItems([
+          ...items, 
+          {
+            productId: product.id,
+            name: product.name,
+            hsn: product.hsn,
+            price: product.price,
+            gstPercent: product.gst_percent,
+            quantity: 1,
+            total: product.price + (product.price * product.gst_percent / 100)
+          }
+        ]);
+      }
+      
+    }
+    // setShowProductList(false);
   };
 
   const updateQuantity = (productId, qty) => {
@@ -97,7 +134,13 @@ function CreateInvoiceScreenBase({ customers, factories, products }) {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <ScrollView style={styles.scrollView}>
+    {/* <View style={styles.container}> */}
+        <ScrollView
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           <Text style={styles.heading}>Create Invoice</Text>
 
           <Text style={styles.label}>Select Customer</Text>
@@ -115,12 +158,11 @@ function CreateInvoiceScreenBase({ customers, factories, products }) {
           <Text style={styles.label}>Invoice Date</Text>
           <TextInput value={date} onChangeText={setDate} style={styles.input} />
 
-          <TouchableOpacity 
-            style={styles.actionBtn} 
-            onPress={() => setShowProductList(true)}
-          >
-            <Text style={styles.label}>Add Products</Text>
-          </TouchableOpacity>
+          <Text style={styles.label}>Add Products</Text>
+          <Picker selectedValue={""} onValueChange={(prodId) => addProductToInvoice(prodId)}>
+            <Picker.Item label="-- Choose Product --" value="" />
+            {products.map(f => <Picker.Item key={f.id} label={f.name} value={f.id} />)}
+          </Picker>
 
           <Text style={styles.label}>Invoice Items:</Text>
           {items.map(it => (
@@ -153,7 +195,7 @@ function CreateInvoiceScreenBase({ customers, factories, products }) {
             </TouchableOpacity>
           </View>
         </ScrollView>
-        <Modal
+        {/* <Modal
           animationType="slide"
           transparent={true}
           visible={showProductList}
@@ -163,7 +205,7 @@ function CreateInvoiceScreenBase({ customers, factories, products }) {
         }}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              {products.map(prod => <TouchableOpacity 
+              {products && products.map(prod => <TouchableOpacity 
               style={styles.actionBtn} 
               onPress={() => addProductToInvoice(prod)}
             >
@@ -171,20 +213,21 @@ function CreateInvoiceScreenBase({ customers, factories, products }) {
             </TouchableOpacity>)}
             </View>
           </View>
-        </Modal>
+        </Modal> */}
       </SafeAreaView>
     </SafeAreaProvider>
   );
 }
 
 // Observe all three tables so updates refresh UI
-const enhance = withObservables([], () => ({
-  customers: database.collections.get('customers').query().observe(),
-  factories: database.collections.get('factories').query().observe(),
-  products: database.collections.get('products').query().observe(),
-}));
+// const enhance = withObservables([], () => ({
+//   customers: database.collections.get('customers').query().observe(),
+//   factories: database.collections.get('factories').query().observe(),
+//   products: database.collections.get('products').query().observe(),
+// }));
 
-export default enhance(CreateInvoiceScreenBase);
+// export default enhance(CreateInvoiceScreenBase);
+export default CreateInvoiceScreenBase;
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },

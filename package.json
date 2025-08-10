@@ -3,7 +3,7 @@
   "main": "App.js",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --dev-client",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
@@ -51,6 +51,7 @@
     "@babel/plugin-proposal-decorators": "^7.28.0",
     "@react-native/babel-preset": "^0.80.2",
     "@types/react": "~19.0.10",
+    "better-sqlite3": "^12.2.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
     "typescript": "~5.8.3"
