@@ -4,8 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { Button, Picker, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { database } from '../../db/database';
 import { showToast } from '../../utils/utils';
-import { database } from '../db/database';
 
 function CreateInvoiceScreenBase({ customers, factories, products, route }) {
   const navigation = useNavigation();

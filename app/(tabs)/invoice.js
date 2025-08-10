@@ -1,12 +1,10 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Button, Alert, Modal, StyleSheet } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
 import { withObservables } from '@nozbe/watermelondb/react';
-import { database } from '../../db/database';
-// import InvoiceForm from '../../components/InvoiceForm';
-import { generateInvoicePDF } from '../../utils/pdfGenerator';
+import { useNavigation } from '@react-navigation/native';
 import * as Sharing from 'expo-sharing';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { database } from '../../db/database';
+import { generateInvoicePDF } from '../../utils/pdfGenerator';
 import { showToast } from '../../utils/utils';
 
 function InvoicesScreenBase({ invoices }) {
