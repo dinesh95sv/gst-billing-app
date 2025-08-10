@@ -1,9 +1,9 @@
-import React from 'react';
-import { View, Text, ScrollView, Button, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { withObservables } from '@nozbe/watermelondb/react';
-import { database } from '../../db/database';
+import React from 'react';
+import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import FactoryForm from '../../components/FactoryForm';
+import { database } from '../../db/database';
 
 // Base functional screen component
 function FactoriesScreenBase({ factories }) {

@@ -1,11 +1,11 @@
 // app/screens/CreateInvoiceScreen.js
-import React, { useState, useEffect } from 'react';
-import { View, Text, Button, Picker, StyleSheet, ScrollView } from 'react-native';
+import { withObservables } from '@nozbe/watermelondb/react';
+import { useNavigation } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
+import { Button, Picker, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
-import { withObservables } from '@nozbe/with-observables';
-import { database } from '../db/database';
 import { showToast } from '../../utils/utils';
+import { database } from '../db/database';
 
 function CreateInvoiceScreenBase({ customers, factories, products, route }) {
   const navigation = useNavigation();

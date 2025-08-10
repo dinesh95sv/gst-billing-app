@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, ScrollView, Button, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native';
 import { withObservables } from '@nozbe/watermelondb/react';
-import { database } from '../../db/database';
+import React from 'react';
+import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CustomerForm from '../../components/CustomerForm';
+import { database } from '../../db/database';
 
 function CustomersScreenBase({ customers }) {
   const [modalVisible, setModalVisible] = React.useState(false);
