@@ -91,7 +91,12 @@ export default function InvoiceForm() {
   return (
     <SafeAreaProvider>
           <SafeAreaView style={styles.container}>
-    <ScrollView style={styles.scrollView}>
+    <ScrollView
+      style={styles.scrollView}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <Text style={styles.label}>Customer</Text>
       <Picker selectedValue={customerId} onValueChange={setCustomerId}>
         <Picker.Item label="Select Customer" value="" />

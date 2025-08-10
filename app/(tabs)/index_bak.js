@@ -14,6 +14,8 @@ function CreateInvoiceScreenBase() {
   const [customers, setCustomers] = useState([]);
   const [factories, setFactories] = useState([]);
   const [products, setProducts] = useState([]);
+
+  const [refreshing, setRefreshing] = useState(false);
   // const [showProductList, setShowProductList] = useState(false);
 
   const [customerId, setCustomerId] = useState(existingInvoice?.customer_id || '');
