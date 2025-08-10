@@ -3,13 +3,13 @@ import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite';
 import { schema } from './schema';
 
 // Import model classes
-import Product from './models/Product';
 import Customer from './models/Customer';
 import Factory from './models/Factory';
 import Invoice from './models/Invoice';
+import Product from './models/Product';
 
 const adapter = new SQLiteAdapter({
-  schema,
+  schema: schema,
   jsi: true, // Use JSI for faster performance
 });
 
