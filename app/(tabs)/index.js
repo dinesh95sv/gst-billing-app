@@ -7,8 +7,9 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
 import { showToast } from '../../utils/utils';
 
-function CreateInvoiceScreenBase({ customers, factories, products, route={} }) {
+function CreateInvoiceScreenBase({ customers, factories, products }) {
   const navigation = useNavigation();
+  const route = useRoute();
   const existingInvoice = route?.params?.existingInvoice || null;
 
   const [showProductList, setShowProductList] = useState(false);
@@ -23,12 +24,6 @@ function CreateInvoiceScreenBase({ customers, factories, products, route={} }) {
     if (!customers.find(c => c.id === customerId)) setCustomerId('');
     if (!factories.find(f => f.id === factoryId)) setFactoryId('');
   }, [customers, factories]);
-
-  useEffect(() => {
-    if (existingInvoice != null) {
-
-    }
-  }, [existingInvoice]);
 
   const addProductToInvoice = (product) => {
     const exists = items.find(i => i.productId === product.id);
@@ -126,25 +121,6 @@ function CreateInvoiceScreenBase({ customers, factories, products, route={} }) {
           >
             <Text style={styles.label}>Add Products</Text>
           </TouchableOpacity>
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={showProductList}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-              setModalVisible(!modalVisible);
-          }}>
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
-                {products.map(prod => <TouchableOpacity 
-                style={styles.actionBtn} 
-                onPress={() => addProductToInvoice(prod)}
-              >
-                <Text style={[styles.actionText, { color: 'red' }]}>{prod.name}</Text>
-              </TouchableOpacity>)}
-              </View>
-            </View>
-          </Modal>
 
           <Text style={styles.label}>Invoice Items:</Text>
           {items.map(it => (
@@ -177,6 +153,25 @@ function CreateInvoiceScreenBase({ customers, factories, products, route={} }) {
             </TouchableOpacity>
           </View>
         </ScrollView>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showProductList}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setModalVisible(!modalVisible);
+        }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              {products.map(prod => <TouchableOpacity 
+              style={styles.actionBtn} 
+              onPress={() => addProductToInvoice(prod)}
+            >
+              <Text style={[styles.actionText, { color: 'red' }]}>{prod.name}</Text>
+            </TouchableOpacity>)}
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </SafeAreaProvider>
   );
