@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, TextInput, View } from 'react-native';
 import { database } from '../db/database';
 
 export default function FactoryForm({ existingFactory, onClose }) {
@@ -30,7 +30,7 @@ export default function FactoryForm({ existingFactory, onClose }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.modalContainer}>
       <TextInput placeholder="Name" value={name} onChangeText={setName} style={styles.input} />
       <TextInput placeholder="Address" value={address} onChangeText={setAddress} style={styles.input} />
       <TextInput placeholder="Contact" value={contact} inputMode="numeric" maxLength={10} onChangeText={setContact} style={styles.input} />
@@ -55,7 +55,7 @@ export default function FactoryForm({ existingFactory, onClose }) {
   );
 }
 const styles = StyleSheet.create({
-  container:{flex: 1, padding:20, backgroundColor:'#80eded', color: '#000'},
+  modalContainer:{flex: 1, padding:20, backgroundColor:'#80eded', color: '#000'},
   input:{borderWidth:1,borderColor:'#ccc',marginBottom:10,padding:8,borderRadius:5},
   btnContainer: { display: 'flex', alignItems: 'flex-end', justifyContent: 'right' },
   btnPrimary: {
