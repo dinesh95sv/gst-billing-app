@@ -51,17 +51,6 @@ function InvoicesScreenBase({ invoices }) {
                 <Text>Date: {inv.date}</Text>
                 <Text>Total: ₹{inv.total.toFixed(2)}</Text>
               </View>
-              <View>
-                <TouchableOpacity onPress={() => shareInvoice(inv)}>
-                  <Text>📤</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => { redirectToCreateInvoice(inv) }}>
-                  <Text>Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => deleteInvoice(inv)}>
-                  <Text>🗑️</Text>
-                </TouchableOpacity>
-              </View>
               <View style={styles.actions}>
                 <TouchableOpacity 
                   style={styles.actionBtn} 
@@ -77,7 +66,7 @@ function InvoicesScreenBase({ invoices }) {
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.actionBtn} 
-                  onPress={() => deleteProduct(prod)}
+                  onPress={() => deleteInvoice(inv)}
                 >
                   <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text>
                 </TouchableOpacity>

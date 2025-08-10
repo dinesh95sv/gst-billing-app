@@ -30,6 +30,11 @@ yarn-error.*
 .DS_Store
 *.pem
 
+# prebuild
+.idea/
+android/
+ios/
+
 # local env files
 .env*.local
 
