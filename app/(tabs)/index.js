@@ -1,6 +1,6 @@
 // app/screens/CreateInvoiceScreen.js
 import { withObservables } from '@nozbe/watermelondb/react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { Button, Picker, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
