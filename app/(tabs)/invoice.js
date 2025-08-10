@@ -46,7 +46,7 @@ function InvoicesScreenBase({ invoices }) {
           <Text style={styles.title}>Invoices</Text>
           {invoices.map(inv => (
             <View key={inv.id} style={styles.card}>
-              <View style={{ flex: 1 }}>
+              <View style={styles.details}>
                 <Text style={styles.name}>{inv.invoiceNumber}</Text>
                 <Text>Date: {inv.date}</Text>
                 <Text>Total: ₹{inv.total.toFixed(2)}</Text>
@@ -56,7 +56,7 @@ function InvoicesScreenBase({ invoices }) {
                   style={styles.actionBtn} 
                   onPress={() => shareInvoice(inv)}
                 >
-                  <Text style={styles.actionText}>Share</Text>
+                  <Text style={[styles.actionText, { color: 'green' }]}>Share</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.actionBtn} 
@@ -79,7 +79,7 @@ function InvoicesScreenBase({ invoices }) {
             style={styles.btnPrimary} 
             onPress={() => redirectToCreateInvoice(null) }
           >
-            <Text style={styles.label}>Add Invoice</Text>
+            <Text style={styles.label}>Create New Invoice</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -96,8 +96,20 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
   scrollView: { flex: 1, alignItems: 'baseline' },
   title: { fontSize: 20, fontWeight: 'bold' },
-  card: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#eee', padding: 10, marginVertical: 5, borderRadius: 5 },
-  name: { fontWeight: 'bold' },
+  card: { 
+    flex: 0.2,
+    flexDirection: 'row',
+    backgroundColor: '#f7f7f7', 
+    padding: 10, 
+    marginVertical: 5, 
+    border: '.5px solid #ddd', 
+    borderRadius: 6 
+  },
+  details: { flex: 0.8 },
+  name: { fontWeight: 'bold', fontSize: 16 },
+  actions: { flex: 0.2, justifyContent: 'center', alignItems: 'flex-end' },
+  actionBtn: { paddingVertical: 4, paddingHorizontal: 8 },
+  actionText: { color: 'blue', fontWeight: '500' },
   btnContainer: { display: 'flex', alignItems: 'flex-end', justifyContent: 'right' },
   btnPrimary: {
     paddingVertical: 12,

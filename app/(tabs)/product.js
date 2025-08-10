@@ -33,7 +33,7 @@ function ProductsScreenBase({ products }) {
               <View style={{ flex:1 }}>
                 <Text style={styles.name}>{prod.name}</Text>
                 <Text>HSN: {prod.hsn}</Text>
-                <Text>₹{prod.price} + {prod.gstPercent}% GST</Text>
+                <Text>₹{prod.price} + {prod.gst_percent}% GST</Text>
               </View>
               <View style={styles.actions}>
                 <TouchableOpacity 

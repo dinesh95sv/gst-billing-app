@@ -27,7 +27,7 @@ function CustomersScreenBase({ customers }) {
           <Text style={styles.title}>Customer List</Text>
           {customers.map(cust => (
             <View key={cust.id} style={styles.card}>
-              <View style={{ flex: 1 }}>
+              <View style={styles.details}>
                 <Text style={styles.name}>{cust.name}</Text>
                 <Text>GSTIN: {cust.gstin}</Text>
               </View>
@@ -75,16 +75,17 @@ const styles = StyleSheet.create({
   scrollView: { flex: 1, alignItems: 'baseline' },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   card: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
+    flex: 0.2,
+    flexDirection: 'row',
     backgroundColor: '#f7f7f7', 
     padding: 10, 
     marginVertical: 5, 
     border: '.5px solid #ddd', 
     borderRadius: 6 
   },
+  details: { flex: 0.8 },
   name: { fontWeight: 'bold', fontSize: 16 },
-  actions: { justifyContent: 'center', alignItems: 'flex-end' },
+  actions: { flex: 0.2, justifyContent: 'center', alignItems: 'flex-end' },
   actionBtn: { paddingVertical: 4, paddingHorizontal: 8 },
   actionText: { color: 'blue', fontWeight: '500' },
   btnContainer: { display: 'flex', alignItems: 'flex-end', justifyContent: 'right' },

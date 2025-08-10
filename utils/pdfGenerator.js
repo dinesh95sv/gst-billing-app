@@ -1,6 +1,6 @@
 import * as FileSystem from 'expo-file-system';
-import * as Print from 'expo-print';
 import * as MediaLibrary from 'expo-media-library';
+import * as Print from 'expo-print';
 import { database } from '../db/database';
 
 /**
@@ -90,7 +90,7 @@ export async function generateInvoicePDF(invoice) {
         <tbody>
           ${items.map((it, idx) => {
             const taxable = it.price * it.quantity;
-            const sgst = (taxable * (it.gstPercent/2) / 100);
+            const sgst = (taxable * (it.gst_percent/2) / 100);
             const cgst = sgst; // equal split
             return `
               <tr>

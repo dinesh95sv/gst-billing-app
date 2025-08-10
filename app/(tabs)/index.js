@@ -1,7 +1,7 @@
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { Button, FlatList, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
@@ -41,15 +41,7 @@ export default function InvoiceForm() {
     setTimeout(() => {
     setRefreshing(false);
     }, 2000);
-}, []);
-
-  const addItem = (productId) => {
-    const exists = items.find(i => i.productId === productId);
-    if (!exists) {
-        const product = products.find(i => i.id === productId) || {};
-        setItems([...items, { productId: product.id, name: product.name, price: product.price, gstPercent: product.gst_percent, quantity: 1, total: product.price + (product.price * product.gst_percent / 100) }]);
-    }
-  };
+  }, []);
 
   const updateQuantity = (productId, qty) => {
     setItems(items.map(it => it.productId === productId ? { ...it, quantity: qty, total: ((it.price * qty) + ((it.price * qty) * it.gstPercent / 100)) } : it));
@@ -57,6 +49,28 @@ export default function InvoiceForm() {
 
   const removeItem = (productId) => {
     setItems(items.filter(it => it.productId !== productId));
+  };
+
+  const addProductToInvoice = (productId) => {
+    const exists = items.find(i => i.productId === productId);
+    if (!exists) {
+      const product = products.find(i => i.id === productId) || {};
+      if (product) {
+        setItems([
+          ...items, 
+          {
+            productId: product.id,
+            name: product.name,
+            hsn: product.hsn,
+            price: product.price,
+            gstPercent: product.gst_percent,
+            quantity: 1,
+            total: product.price + (product.price * product.gst_percent / 100)
+          }
+        ]);
+      }
+    }
+    // setShowProductList(false);
   };
 
   const saveInvoice = async () => {
@@ -106,48 +120,69 @@ export default function InvoiceForm() {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      <Text style={styles.label}>Customer</Text>
-      <Picker selectedValue={customerId} onValueChange={setCustomerId}>
-        <Picker.Item label="Select Customer" value="" />
-        {customers.map(c => <Picker.Item key={c.id} label={c.name} value={c.id} />)}
-      </Picker>
-
-      <Text style={styles.label}>Factory</Text>
-      <Picker selectedValue={factoryId} onValueChange={setFactoryId}>
-        <Picker.Item label="Select Factory" value="" />
-        {factories.map(f => <Picker.Item key={f.id} label={f.name} value={f.id} />)}
-      </Picker>
-
-      <Text style={styles.label}>Invoice Date</Text>
-      <TextInput value={date} onChangeText={setDate} style={styles.input} />
-
-      <Text style={styles.label}>Products</Text>
-      <FlatList
-        data={products}
-        keyExtractor={(item) => item.id}
-        horizontal
-        renderItem={({ item }) => (
-          <Button title={item.name} onPress={() => addItem(item)} />
-        )}
-      />
-
-      <Text style={styles.label}>Items in Invoice:</Text>
-      {items.map(it => (
-        <View key={it.productId} style={styles.itemRow}>
-          <Text style={{ flex: 1 }}>{it.name}</Text>
-          <TextInput
-            style={styles.qtyInput}
-            keyboardType="numeric"
-            value={String(it.quantity)}
-            onChangeText={(v) => updateQuantity(it.productId, parseInt(v) || 1)}
-          />
-          <Text>₹{it.total.toFixed(2)}</Text>
-          <Button title="❌" onPress={() => removeItem(it.productId)} />
+      <View style={styles.content}>
+        <View>
+          <Text style={styles.label}>Customer</Text>
+          <Picker selectedValue={customerId} style={styles.dropdown} onValueChange={setCustomerId}>
+            <Picker.Item label="Select Customer" value="" />
+            {customers.map(c => <Picker.Item key={c.id} label={c.name} value={c.id} />)}
+          </Picker>
         </View>
-      ))}
 
-      <Button title="Save Invoice" onPress={saveInvoice} />
-      <Button title="Reset" onPress={onReset} color="grey" />
+        <View>
+          <Text style={styles.label}>Factory</Text>
+          <Picker selectedValue={factoryId} onValueChange={setFactoryId}>
+            <Picker.Item label="Select Factory" value="" />
+            {factories.map(f => <Picker.Item key={f.id} label={f.name} value={f.id} />)}
+          </Picker>
+        </View>
+
+        <View>
+          <Text style={styles.label}>Invoice Date</Text>
+          <TextInput value={date} onChangeText={setDate} style={styles.input} />
+        </View>
+
+        <View>
+          <Text style={styles.label}>Add Products</Text>
+          <Picker selectedValue={""} onValueChange={(prodId) => addProductToInvoice(prodId)}>
+            <Picker.Item label="-- Choose Product --" value="" />
+            {products.map(f => <Picker.Item key={f.id} label={f.name} value={f.id} />)}
+          </Picker>
+        </View>
+
+        <View>
+        <Text style={styles.label}>Items in Invoice:</Text>
+        {items.map(it => (
+          <View key={it.productId} style={styles.itemRow}>
+            <Text style={{ flex: 1 }}>{it.name}</Text>
+            <TextInput
+              style={styles.qtyInput}
+              keyboardType="numeric"
+              value={it.quantity.toFixed(0)}
+              onChangeText={(v) => updateQuantity(it.productId, parseInt(v) || 1)}
+            />
+            <Text>₹{it.total.toFixed(2)}</Text>
+            <Button title="❌" onPress={() => removeItem(it.productId)} />
+          </View>
+        ))}
+        </View>
+
+        <View style={styles.btnContainer}>
+          <TouchableOpacity
+            style={styles.btnSecondary} 
+            onPress={onReset}
+          >
+            <Text style={styles.label}>Reset</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.btnPrimary}
+            onPress={saveInvoice}
+            disabled={!customerId || !factoryId || items.length === 0}
+          >
+            <Text style={styles.label}>Save Invoice</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </ScrollView>
     </SafeAreaView>
     </SafeAreaProvider>
@@ -157,8 +192,10 @@ export default function InvoiceForm() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
   scrollView: { flex: 1, alignItems: 'baseline' },
+  content: { flexDirection: 'column' },
   heading: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   label: { fontWeight: 'bold', marginTop: 10 },
+  dropdown: { backgroundColor: '#edf4ff', borderWidth:1, borderColor:'#ccc'},
   actions: { justifyContent: 'center', alignItems: 'center' },
   actionBtn: { paddingVertical: 4, paddingHorizontal: 8 },
   actionText: { color: 'blue', fontWeight: '500' },

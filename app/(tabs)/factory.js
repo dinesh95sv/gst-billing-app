@@ -36,7 +36,7 @@ function FactoriesScreenBase({ factories }) {
           <Text style={styles.title}>Factories</Text>
           {factories.map(fac => (
             <View key={fac.id} style={styles.card}>
-              <View style={{ flex: 1 }}>
+              <View style={styles.details}>
                 <Text style={styles.name}>{fac.name}</Text>
                 {fac.address ? <Text>{fac.address}</Text> : null}
                 {fac.contact ? <Text>Contact: {fac.contact}</Text> : null}
@@ -96,15 +96,17 @@ const styles = StyleSheet.create({
   scrollView: { flex: 1, alignItems: 'baseline' },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   card: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
+    flex: 0.2,
+    flexDirection: 'row',
     backgroundColor: '#f7f7f7', 
     padding: 10, 
     marginVertical: 5, 
+    border: '.5px solid #ddd', 
     borderRadius: 6 
   },
+  details: { flex: 0.8 },
   name: { fontWeight: 'bold', fontSize: 16 },
-  actions: { justifyContent: 'center', alignItems: 'flex-end' },
+  actions: { flex: 0.2, justifyContent: 'center', alignItems: 'flex-end' },
   actionBtn: { paddingVertical: 4, paddingHorizontal: 8 },
   actionText: { color: 'blue', fontWeight: '500' },
   btnContainer: { display: 'flex', alignItems: 'flex-end', justifyContent: 'right' },
