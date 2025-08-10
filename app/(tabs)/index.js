@@ -7,9 +7,9 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
 import { showToast } from '../../utils/utils';
 
-function CreateInvoiceScreenBase({ customers, factories, products, route:{} }) {
+function CreateInvoiceScreenBase({ customers, factories, products, route={} }) {
   const navigation = useNavigation();
-  const { existingInvoice } = route?.params || null;
+  const existingInvoice = route?.params?.existingInvoice || null;
 
   const [showProductList, setShowProductList] = useState(false);
 
