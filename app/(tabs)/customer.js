@@ -1,6 +1,7 @@
 import { withObservables } from '@nozbe/watermelondb/react';
 import React from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import CustomerForm from '../../components/CustomerForm';
 import { database } from '../../db/database';
 

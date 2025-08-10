@@ -1,8 +1,9 @@
 // app/screens/CreateInvoiceScreen.js
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Picker, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Button, Picker, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { RefreshControl } from 'react-native-gesture-handler';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
 import { showToast } from '../../utils/utils';
 
@@ -112,7 +113,7 @@ function CreateInvoiceScreenBase() {
             inv.customer_id = customerId;
             inv.factory_id = factoryId;
             inv.items_json = JSON.stringify(items);
-            inv.gst_breakup = gstBreakup;
+            inv.gst_breakup = gst_breakup;
             inv.total = total;
           });
         } else {
