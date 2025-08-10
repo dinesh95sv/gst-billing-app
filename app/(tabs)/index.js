@@ -2,7 +2,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { RefreshControl, ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
 
@@ -14,6 +14,8 @@ export default function InvoiceForm() {
   const [customers, setCustomers] = useState([]);
   const [factories, setFactories] = useState([]);
   const [products, setProducts] = useState([]);
+
+  const [refreshing, setRefreshing] = useState(false);
 
   const [customerId, setCustomerId] = useState(existingInvoice?.customer_id || '');
   const [factoryId, setFactoryId] = useState(existingInvoice?.factory_id || '');
@@ -88,6 +90,13 @@ export default function InvoiceForm() {
     navigation.navigate('invoice');
   };
 
+  const onReset = () => {
+    setCustomerId(existingInvoice?.customer_id || '');
+    setFactoryId(existingInvoice?.factory_id || '');
+    setDate(existingInvoice?.date || new Date().toISOString().split('T')[0]);
+    setItems(existingInvoice ? JSON.parse(existingInvoice.items_json) : []);
+  }
+
   return (
     <SafeAreaProvider>
           <SafeAreaView style={styles.container}>
@@ -138,7 +147,7 @@ export default function InvoiceForm() {
       ))}
 
       <Button title="Save Invoice" onPress={saveInvoice} />
-      <Button title="Cancel" onPress={onClose} color="grey" />
+      <Button title="Reset" onPress={onReset} color="grey" />
     </ScrollView>
     </SafeAreaView>
     </SafeAreaProvider>
