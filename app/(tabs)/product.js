@@ -1,4 +1,3 @@
-import { Q } from '@nozbe/watermelondb';
 import { withObservables } from '@nozbe/watermelondb/react';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
@@ -15,14 +14,14 @@ function ProductsScreenBase({ products }) {
 
   React.useEffect(() => {
     (async () => {
-      const productsData = await database.collections.get('products').query(Q.sortBy('updatedAt', Q.desc)).fetch();
+      const productsData = await database.collections.get('products').query().fetch();
       setProductsList([ ...productsData ]);
     })();
   }, [products]);
 
   React.useEffect(() => {
     (async () => {
-      const productsData = await database.collections.get('products').query(Q.sortBy('updatedAt', Q.desc)).fetch();
+      const productsData = await database.collections.get('products').query().fetch();
       setProductsList([ ...productsData ]);
     })();
   }, []);
