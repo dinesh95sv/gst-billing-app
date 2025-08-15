@@ -19,13 +19,15 @@ function InvoicesScreenBase({ invoices }) {
 
   React.useEffect(() => {
     (async () => {
-      setInvoicesList(await database.collections.get('invoices').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+      const invoiceData = await database.collections.get('invoices').query(Q.sortBy('updatedAt', Q.desc)).fetch();
+      setInvoicesList([ ...invoiceData ]);
     })();
   }, [invoices]);
 
   React.useEffect(() => {
     (async () => {
-      setInvoicesList(await database.collections.get('invoices').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+      const invoiceData = await database.collections.get('invoices').query(Q.sortBy('updatedAt', Q.desc)).fetch();
+      setInvoicesList([ ...invoiceData ]);
     })();
   }, []);
 

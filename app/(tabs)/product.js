@@ -15,13 +15,15 @@ function ProductsScreenBase({ products }) {
 
   React.useEffect(() => {
     (async () => {
-      setProductsList(await database.collections.get('products').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+      const productsData = await database.collections.get('products').query(Q.sortBy('updatedAt', Q.desc)).fetch();
+      setProductsList([ ...productsData ]);
     })();
   }, [products]);
 
   React.useEffect(() => {
     (async () => {
-      setProductsList(await database.collections.get('products').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+      const productsData = await database.collections.get('products').query(Q.sortBy('updatedAt', Q.desc)).fetch();
+      setProductsList([ ...productsData ]);
     })();
   }, []);
 

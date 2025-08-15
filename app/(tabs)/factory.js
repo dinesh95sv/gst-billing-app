@@ -17,13 +17,15 @@ function FactoriesScreenBase({ factories }) {
 
   React.useEffect(() => {
     (async () => {
-      setFactoriesList(await database.collections.get('factories').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+      const factoryData = await database.collections.get('factories').query(Q.sortBy('updatedAt', Q.desc)).fetch();
+      setFactoriesList([ ...factoryData ]);
     })();
   }, [factories]);
 
   React.useEffect(() => {
     (async () => {
-      setFactoriesList(await database.collections.get('factories').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+      const factoryData = await database.collections.get('factories').query(Q.sortBy('updatedAt', Q.desc)).fetch();
+      setFactoriesList([ ...factoryData ]);
     })();
   }, []);
 

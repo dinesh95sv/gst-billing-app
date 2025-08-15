@@ -16,13 +16,15 @@ function CustomersScreenBase({ customers }) {
 
   React.useEffect(() => {
     (async () => {
-      setCustomersList(await database.collections.get('customers').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+      const customerData = await database.collections.get('customers').query(Q.sortBy('updatedAt', Q.desc)).fetch();
+      setCustomersList([ ...customerData ]);
     })();
   }, [customers]);
 
   React.useEffect(() => {
     (async () => {
-      setCustomersList(await database.collections.get('customers').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+      const customerData = await database.collections.get('customers').query(Q.sortBy('updatedAt', Q.desc)).fetch();
+      setCustomersList([ ...customerData ]);
     })();
   }, []);
 
