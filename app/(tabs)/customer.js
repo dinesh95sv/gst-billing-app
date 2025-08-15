@@ -72,7 +72,7 @@ function CustomersScreenBase({ customers }) {
 }
 
 const enhance = withObservables([], () => ({
-  customers: database.collections.get('customers').query().observe(),
+  customers: database.collections.get('customers').query(Q.sortBy('updatedAt', Q.desc)).observe(),
 }));
 export default enhance(CustomersScreenBase);
 

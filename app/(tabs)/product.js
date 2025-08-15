@@ -75,7 +75,7 @@ function ProductsScreenBase({ products }) {
   );
 }
 const enhance = withObservables([], () => ({
-  products: database.collections.get('products').query().observe()
+  products: database.collections.get('products').query(Q.sortBy('updatedAt', Q.desc)).observe()
 }));
 export default enhance(ProductsScreenBase);
 const styles = StyleSheet.create({

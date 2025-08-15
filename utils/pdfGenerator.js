@@ -1,6 +1,7 @@
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import * as Print from 'expo-print';
+import { Platform } from 'react-native';
 import { database } from '../db/database';
 
 /**
@@ -80,10 +81,10 @@ const savePDFToDevice = async (pdfUri, fileName) => {
         try {
           // Create asset and add to media library
           const asset = await MediaLibrary.createAssetAsync(finalPath);
-          const album = await MediaLibrary.getAlbumAsync('Bills');
+          const album = await MediaLibrary.getAlbumAsync('Invoice');
           
           if (album == null) {
-            await MediaLibrary.createAlbumAsync('Bills', asset, false);
+            await MediaLibrary.createAlbumAsync('Invoice', asset, false);
           } else {
             await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
           }
@@ -242,8 +243,7 @@ export async function generateInvoicePDF(invoice) {
       const { uri } = await Print.printToFileAsync({ html: htmlContent });
       
       // Create filename with timestamp
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-      const fileName = `${invoice.invoiceNumber}_${timestamp}.pdf`;
+      const fileName = `${invoice.invoiceNumber}.pdf`;
       
       // Save to device storage
       const savedPath = await savePDFToDevice(uri, fileName);

@@ -92,7 +92,7 @@ function FactoriesScreenBase({ factories }) {
 
 // Enhance with WatermelonDB reactive data
 const enhance = withObservables([], () => ({
-  factories: database.collections.get('factories').query().observe(),
+  factories: database.collections.get('factories').query(Q.sortBy('updatedAt', Q.desc)).observe(),
 }));
 
 export default enhance(FactoriesScreenBase);

@@ -1,4 +1,3 @@
-import { Q } from '@nozbe/watermelondb';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -46,19 +45,22 @@ export default function InvoiceForm() {
   }, []);
 
   const updateQuantity = (productId, qty) => {
-    if (qty != '') {
+    if (qty !== '') {
       setItems(items.map(it => it.productId === productId ? { ...it, quantity: qty, total: ((it.price * qty) + ((it.price * qty) * it.gstPercent / 100)) } : it));
-  
+    } else {
+      setItems(items.map(it => it.productId === productId ? { ...it, quantity: ''} : it));
     }
   };
 
   const checkItemsQty = () => {
     let err = false;
-    items.length > 0
-      ? items.forEach(item => {
-          if (item.quantity < 1) err = true;
-        })
-      : err = true;
+    if (items.length > 0) {
+      items.forEach(item => {
+        if (item.quantity === '' || item.quantity < 1) err = true;
+      });
+      return err;
+    }
+    err = true;
     return err;
   }
 
@@ -92,11 +94,10 @@ export default function InvoiceForm() {
     const gstBreakup = items.reduce((acc, it) => acc + ((it.price * it.quantity) * it.gstPercent / 100), 0);
     const total = items.reduce((acc, it) => acc + it.total, 0);
     // const invoiceNo = `INV-${Date.now().toString().slice(-6)}`;
-    const newDate = new Date(date);
-    const invoiceDate = `INV-${newDate.getFullYear()}${(newDate.getMonth() + 1)}${newDate.getDate()}`;
-    const invoicesOnDayCount = database.collections.get('invoices').query(Q.where("invoice_number", Q.like(`${invoiceDate}%`))).fetchCount();
-    const currentInv = `${invoicesOnDayCount+1}`.padStart(4, "0");
-    const invoiceNo = `${invoiceDate}${currentInv}`;
+    const newDate = new Date();
+    const hrs = newDate.getHours().toString().padStart(2, "0");
+    const mins = newDate.getMinutes().toString().padStart(2, "0");
+    const invoiceNo = `INV-${newDate.getFullYear()}${(newDate.getMonth() + 1)}${newDate.getDate()}${hrs}${mins}`;
 
     await database.write(async () => {
       if (existingInvoice) {
@@ -156,7 +157,7 @@ export default function InvoiceForm() {
 
             <View>
               <Text style={styles.label}>Factory</Text>
-              <Picker selectedValue={factoryId} onValueChange={setFactoryId}>
+              <Picker selectedValue={factoryId} style={styles.dropdown} onValueChange={setFactoryId}>
                 <Picker.Item label="Select Factory" value="" />
                 {factories.map(f => <Picker.Item key={f.id} label={f.name} value={f.id} />)}
               </Picker>
@@ -180,13 +181,13 @@ export default function InvoiceForm() {
             {items.map(it => (
               <View key={it.productId} style={styles.itemRow}>
                 <Text style={{ flex: 1 }}>{it.name}</Text>
-                <View>
+                <View style={{ flex: 1}}>
                   <Text>Qty:</Text>
                   <TextInput
-                    style={styles.qtyInput}
+                    style={styles.input}
                     keyboardType="numeric"
                     value={it.quantity.toFixed(0)}
-                    onChangeText={(v) => {v != '' ? updateQuantity(it.productId, parseInt(v)) || 1 : updateQuantity(it.productId, '')}}
+                    onChangeText={(v) => updateQuantity(it.productId, parseInt(v)) || updateQuantity(it.productId, '')}
                   />
                   <Text>₹{it.total.toFixed(2)}</Text>
                   <Button title="❌" onPress={() => removeItem(it.productId)} />
@@ -224,6 +225,7 @@ const styles = StyleSheet.create({
   heading: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   label: { fontWeight: 'bold', marginTop: 10 },
   dropdown: { backgroundColor: '#edf4ff', borderWidth:1, borderColor:'#ccc'},
+  input:{borderWidth:1,borderColor:'#807f7f',backgroundColor:'#edf4ff',color: '#000',marginBottom:10,padding:8,borderRadius:5},
   actions: { justifyContent: 'center', alignItems: 'center' },
   actionBtn: { paddingVertical: 4, paddingHorizontal: 8 },
   actionText: { color: 'blue', fontWeight: '500' },

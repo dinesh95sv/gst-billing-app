@@ -10,6 +10,8 @@ export const schema = appSchema({
         { name: 'hsn', type: 'string', isOptional: true },
         { name: 'price', type: 'number' },
         { name: 'gst_percent', type: 'number' },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
       ],
     }),
     tableSchema({
@@ -20,6 +22,8 @@ export const schema = appSchema({
         { name: 'phone', type: 'string', isOptional: true },
         { name: 'email', type: 'string', isOptional: true },
         { name: 'gstin', type: 'string' },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
       ],
     }),
     tableSchema({
@@ -29,6 +33,8 @@ export const schema = appSchema({
         { name: 'address', type: 'string', isOptional: true },
         { name: 'contact', type: 'string', isOptional: true },
         { name: 'gstin', type: 'string' },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
       ],
     }),
     tableSchema({
@@ -41,6 +47,8 @@ export const schema = appSchema({
         { name: 'items_json', type: 'string' }, // store array as JSON
         { name: 'gst_breakup', type: 'number' },
         { name: 'total', type: 'number' },
+        { name: 'created_at', type: 'number' },
+        { name: 'updated_at', type: 'number' },
       ],
     }),
   ],

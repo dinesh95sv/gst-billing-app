@@ -1,3 +1,4 @@
+import { Q } from '@nozbe/watermelondb';
 import { withObservables } from '@nozbe/watermelondb/react';
 import { useNavigation } from '@react-navigation/native';
 import * as Sharing from 'expo-sharing';
@@ -96,7 +97,7 @@ function InvoicesScreenBase({ invoices }) {
 }
 
 const enhance = withObservables([], () => ({
-  invoices: database.collections.get('invoices').query().observe()
+  invoices: database.collections.get('invoices').query(Q.sortBy('updatedAt', Q.desc)).observe()
 }));
 export default enhance(InvoicesScreenBase);
 

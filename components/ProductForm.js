@@ -48,7 +48,7 @@ export default function ProductForm({ existingProduct, onClose }) {
           style={styles.btnPrimary}
           onPress={saveProduct}
         >
-          <Text style={styles.label}>Save Invoice</Text>
+          <Text style={styles.label}>Save Product</Text>
         </TouchableOpacity>
       </View>
     </View>
