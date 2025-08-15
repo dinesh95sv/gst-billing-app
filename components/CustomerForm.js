@@ -56,7 +56,7 @@ export default function CustomerForm({ existingCustomer, onClose }) {
 }
 const styles = StyleSheet.create({
   modalContainer:{flex: 1, padding:20, backgroundColor:'#80eded', color: '#000'},
-  input:{borderWidth:1,borderColor:'#ccc',backgroundColor:'#edf4ff',marginBottom:10,padding:8,borderRadius:5},
+  input:{borderWidth:1,borderColor:'#807f7f',backgroundColor:'#edf4ff',color: '#000',marginBottom:10,padding:8,borderRadius:5},
   btnContainer: { display: 'flex', alignItems: 'flex-end', justifyContent: 'right' },
   btnPrimary: {
     paddingVertical: 12,

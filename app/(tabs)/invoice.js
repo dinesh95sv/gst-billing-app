@@ -1,6 +1,7 @@
 import { withObservables } from '@nozbe/watermelondb/react';
 import { useNavigation } from '@react-navigation/native';
 import * as Sharing from 'expo-sharing';
+import { StatusBar } from 'expo-status-bar';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
@@ -28,7 +29,9 @@ function InvoicesScreenBase({ invoices }) {
 
   const shareInvoice = async (invoice) => {
     const uri = await generateInvoicePDF(invoice);
-    await Sharing.shareAsync(uri);
+    if (uri != null) {
+      await Sharing.shareAsync(uri);
+    }
   };
 
   const redirectToCreateInvoice = (inv) => {
@@ -42,6 +45,11 @@ function InvoicesScreenBase({ invoices }) {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
+        <StatusBar
+          backgroundColor="#000000"
+          statusBarStyle='light'
+          hidden={false}
+        />
         <ScrollView style={styles.scrollView}>
           <Text style={styles.title}>Invoices</Text>
           {invoices.map(inv => (
@@ -94,7 +102,7 @@ export default enhance(InvoicesScreenBase);
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
-  scrollView: { flex: 1, alignItems: 'baseline' },
+  scrollView: { flex: 1 },
   title: { fontSize: 20, fontWeight: 'bold' },
   card: { 
     flex: 0.2,

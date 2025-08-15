@@ -8,18 +8,113 @@ import { database } from '../db/database';
  * @param {Model} invoice WatermelonDB invoice instance
  * @returns {Promise<string>} File URI of the generated PDF
  */
-export async function generateInvoicePDF(invoice) {
-  // Fetch related data
-  const customer = await database.collections
-    .get('customers')
-    .find(invoice.customer_id);
-  const factory = await database.collections
-    .get('factories')
-    .find(invoice.factory_id);
-  const items = JSON.parse(invoice.items_json || '[]');
 
-  // Build HTML for invoice
-    const html = `
+const requestStoragePermission = async () => {
+    try {
+        if (Platform.OS === 'android') {
+            const permission = await MediaLibrary.requestPermissionsAsync();
+            if (!permission.granted) {
+                Alert.alert(
+                    'Permission Required',
+                    'Storage permission is required to save invoices to your device.',
+                    [{ text: 'OK' }]
+                );
+                return false;
+            }
+        }
+        return true;
+    } catch (error) {
+        console.error('Permission error:', error);
+        Alert.alert('Error', 'Failed to request storage permission');
+        return false;
+    }
+};
+
+const ensureBillsDirectoryExists = async () => {
+    try {
+        let billsPath;
+
+        if (Platform.OS === 'android') {
+            // Use the Downloads directory which is accessible
+            billsPath = `${FileSystem.documentDirectory}Invoice/`;
+        } else {
+            // For iOS, use the app's document directory
+            billsPath = `${FileSystem.documentDirectory}Invoice/`;
+        }
+
+        const dirInfo = await FileSystem.getInfoAsync(billsPath);
+
+        if (!dirInfo.exists) {
+            await FileSystem.makeDirectoryAsync(billsPath, { intermediates: true });
+            console.log('Bills directory created at:', billsPath);
+        }
+
+        return billsPath;
+    } catch (error) {
+        console.error('Error creating Bills directory:', error);
+        // Fallback to document directory
+        return FileSystem.documentDirectory;
+    }
+};
+
+const savePDFToDevice = async (pdfUri, fileName) => {
+    try {
+      const hasPermission = await requestStoragePermission();
+      if (!hasPermission) {
+        return null;
+      }
+
+      const billsPath = await ensureBillsDirectoryExists();
+      const finalPath = `${billsPath}${fileName}`;
+      
+      // Copy the PDF to the Bills directory
+      await FileSystem.copyAsync({
+        from: pdfUri,
+        to: finalPath
+      });
+
+      console.log('PDF saved to:', finalPath);
+      
+      // For Android, also try to save to external storage if possible
+      if (Platform.OS === 'android') {
+        try {
+          // Create asset and add to media library
+          const asset = await MediaLibrary.createAssetAsync(finalPath);
+          const album = await MediaLibrary.getAlbumAsync('Bills');
+          
+          if (album == null) {
+            await MediaLibrary.createAlbumAsync('Bills', asset, false);
+          } else {
+            await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+          }
+          
+          console.log('PDF also saved to device gallery/downloads');
+        } catch (mediaError) {
+          console.log('Could not save to media library:', mediaError.message);
+          // This is not critical, the file is still saved in app directory
+        }
+      }
+      
+      return finalPath;
+    } catch (error) {
+      console.error('Error saving PDF to device:', error);
+      Alert.alert('Error', 'Failed to save PDF to device storage');
+      return null;
+    }
+  };
+
+export async function generateInvoicePDF(invoice) {
+    // Fetch related data
+    const customer = await database.collections
+        .get('customers')
+        .find(invoice.customer_id);
+    const factory = await database.collections
+        .get('factories')
+        .find(invoice.factory_id);
+    const items = JSON.parse(invoice.items_json || '[]');
+
+    // Build HTML for invoice
+    const htmlContent = `
   <html>
     <head>
       <meta charset="utf-8" />
@@ -89,10 +184,10 @@ export async function generateInvoicePDF(invoice) {
         </thead>
         <tbody>
           ${items.map((it, idx) => {
-            const taxable = it.price * it.quantity;
-            const sgst = (taxable * (it.gst_percent/2) / 100);
-            const cgst = sgst; // equal split
-            return `
+        const taxable = it.price * it.quantity;
+        const sgst = (taxable * (it.gstPercent / 2) / 100);
+        const cgst = sgst; // equal split
+        return `
               <tr>
                 <td class="text-center">${idx + 1}</td>
                 <td>${it.name}</td>
@@ -105,7 +200,7 @@ export async function generateInvoicePDF(invoice) {
                 <td class="text-right">₹${it.total.toFixed(2)}</td>
               </tr>
             `;
-          }).join('')}
+    }).join('')}
         </tbody>
       </table>
 
@@ -141,32 +236,22 @@ export async function generateInvoicePDF(invoice) {
   `;
 
 
-  // Create PDF from HTML
-  const { uri } = await Print.printToFileAsync({ html });
-
-  // Target path in app's document directory
-  const fileName = `${invoice.invoice_number}.pdf`;
-  const appDocPath = `${FileSystem.documentDirectory}${fileName}`;
-
-  // Move file to app documents
-  await FileSystem.moveAsync({
-    from: uri,
-    to: appDocPath
-  });
-
-  // Save to Downloads if Android permission granted
-  try {
-    const perm = await MediaLibrary.getPermissionsAsync();
-    if (perm.status === 'granted') {
-      const asset = await MediaLibrary.createAssetAsync(appDocPath);
-      await MediaLibrary.createAlbumAsync('Download', asset, false);
-      console.log('✅ Saved to Downloads');
-    } else {
-      console.log('⚠️ Could not save to Downloads (permission denied)');
+    // Create PDF from HTML
+    try {
+      // Generate PDF
+      const { uri } = await Print.printToFileAsync({ html: htmlContent });
+      
+      // Create filename with timestamp
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+      const fileName = `${invoice.invoiceNumber}_${timestamp}.pdf`;
+      
+      // Save to device storage
+      const savedPath = await savePDFToDevice(uri, fileName);
+      return savedPath;
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        Alert.alert('Error', 'Failed to generate invoice PDF: ' + error.message);
     }
-  } catch (err) {
-    console.log('Saving to Downloads failed:', err);
-  }
 
-  return appDocPath; // return internal file path
+    return null; // return failure
 }

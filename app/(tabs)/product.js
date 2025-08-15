@@ -1,4 +1,5 @@
 import { withObservables } from '@nozbe/watermelondb/react';
+import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -26,11 +27,16 @@ function ProductsScreenBase({ products }) {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
+        <StatusBar
+          backgroundColor="#000000"
+          statusBarStyle='light'
+          hidden={false}
+        />
         <ScrollView style={styles.scrollView}>
           <Text style={styles.title}>Products</Text>
           {products.map(prod => (
             <View key={prod.id} style={styles.card}>
-              <View style={{ flex:1 }}>
+              <View style={styles.details}>
                 <Text style={styles.name}>{prod.name}</Text>
                 <Text>HSN: {prod.hsn}</Text>
                 <Text>₹{prod.price} + {prod.gst_percent}% GST</Text>
@@ -74,19 +80,20 @@ const enhance = withObservables([], () => ({
 export default enhance(ProductsScreenBase);
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
-  scrollView: { flex: 1, alignItems: 'baseline' },
+  scrollView: { flex: 1 },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   card: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
+    flex: 0.2,
+    flexDirection: 'row',
     backgroundColor: '#f7f7f7', 
     padding: 10, 
     marginVertical: 5, 
     border: '.5px solid #ddd', 
     borderRadius: 6 
   },
+  details: { flex: 0.8 },
   name: { fontWeight: 'bold', fontSize: 16 },
-  actions: { justifyContent: 'center', alignItems: 'flex-end' },
+  actions: { flex: 0.2, justifyContent: 'center', alignItems: 'flex-end' },
   actionBtn: { paddingVertical: 4, paddingHorizontal: 8 },
   actionText: { color: 'blue', fontWeight: '500' },
   btnContainer: { display: 'flex', alignItems: 'flex-end', justifyContent: 'right' },

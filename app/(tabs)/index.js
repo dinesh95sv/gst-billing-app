@@ -1,5 +1,7 @@
+import { Q } from '@nozbe/watermelondb';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import { Button, RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -44,8 +46,21 @@ export default function InvoiceForm() {
   }, []);
 
   const updateQuantity = (productId, qty) => {
-    setItems(items.map(it => it.productId === productId ? { ...it, quantity: qty, total: ((it.price * qty) + ((it.price * qty) * it.gstPercent / 100)) } : it));
+    if (qty != '') {
+      setItems(items.map(it => it.productId === productId ? { ...it, quantity: qty, total: ((it.price * qty) + ((it.price * qty) * it.gstPercent / 100)) } : it));
+  
+    }
   };
+
+  const checkItemsQty = () => {
+    let err = false;
+    items.length > 0
+      ? items.forEach(item => {
+          if (item.quantity < 1) err = true;
+        })
+      : err = true;
+    return err;
+  }
 
   const removeItem = (productId) => {
     setItems(items.filter(it => it.productId !== productId));
@@ -76,7 +91,12 @@ export default function InvoiceForm() {
   const saveInvoice = async () => {
     const gstBreakup = items.reduce((acc, it) => acc + ((it.price * it.quantity) * it.gstPercent / 100), 0);
     const total = items.reduce((acc, it) => acc + it.total, 0);
-    const invoiceNo = `INV-${Date.now().toString().slice(-6)}`;
+    // const invoiceNo = `INV-${Date.now().toString().slice(-6)}`;
+    const newDate = new Date(date);
+    const invoiceDate = `INV-${newDate.getFullYear()}${(newDate.getMonth() + 1)}${newDate.getDate()}`;
+    const invoicesOnDayCount = database.collections.get('invoices').query(Q.where("invoice_number", Q.like(`${invoiceDate}%`))).fetchCount();
+    const currentInv = `${invoicesOnDayCount+1}`.padStart(4, "0");
+    const invoiceNo = `${invoiceDate}${currentInv}`;
 
     await database.write(async () => {
       if (existingInvoice) {
@@ -113,85 +133,93 @@ export default function InvoiceForm() {
 
   return (
     <SafeAreaProvider>
-          <SafeAreaView style={styles.container}>
-    <ScrollView
-      style={styles.scrollView}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View style={styles.content}>
-        <View>
-          <Text style={styles.label}>Customer</Text>
-          <Picker selectedValue={customerId} style={styles.dropdown} onValueChange={setCustomerId}>
-            <Picker.Item label="Select Customer" value="" />
-            {customers.map(c => <Picker.Item key={c.id} label={c.name} value={c.id} />)}
-          </Picker>
-        </View>
+      <SafeAreaView style={styles.container}>
+        <StatusBar
+          backgroundColor="#000000"
+          statusBarStyle='light'
+          hidden={false}
+        />
+        <ScrollView
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <View style={styles.content}>
+            <View>
+              <Text style={styles.label}>Customer</Text>
+              <Picker selectedValue={customerId} style={styles.dropdown} onValueChange={setCustomerId}>
+                <Picker.Item label="Select Customer" value="" />
+                {customers.map(c => <Picker.Item key={c.id} label={c.name} value={c.id} />)}
+              </Picker>
+            </View>
 
-        <View>
-          <Text style={styles.label}>Factory</Text>
-          <Picker selectedValue={factoryId} onValueChange={setFactoryId}>
-            <Picker.Item label="Select Factory" value="" />
-            {factories.map(f => <Picker.Item key={f.id} label={f.name} value={f.id} />)}
-          </Picker>
-        </View>
+            <View>
+              <Text style={styles.label}>Factory</Text>
+              <Picker selectedValue={factoryId} onValueChange={setFactoryId}>
+                <Picker.Item label="Select Factory" value="" />
+                {factories.map(f => <Picker.Item key={f.id} label={f.name} value={f.id} />)}
+              </Picker>
+            </View>
 
-        <View>
-          <Text style={styles.label}>Invoice Date</Text>
-          <TextInput value={date} onChangeText={setDate} style={styles.input} />
-        </View>
+            <View>
+              <Text style={styles.label}>Invoice Date</Text>
+              <TextInput value={date} onChangeText={setDate} style={styles.input} />
+            </View>
 
-        <View>
-          <Text style={styles.label}>Add Products</Text>
-          <Picker selectedValue={""} onValueChange={(prodId) => addProductToInvoice(prodId)}>
-            <Picker.Item label="-- Choose Product --" value="" />
-            {products.map(f => <Picker.Item key={f.id} label={f.name} value={f.id} />)}
-          </Picker>
-        </View>
+            <View>
+              <Text style={styles.label}>Add Products</Text>
+              <Picker selectedValue={""} onValueChange={(prodId) => addProductToInvoice(prodId)}>
+                <Picker.Item label="-- Choose Product --" value="" />
+                {products.map(f => <Picker.Item key={f.id} label={f.name} value={f.id} />)}
+              </Picker>
+            </View>
 
-        <View>
-        <Text style={styles.label}>Items in Invoice:</Text>
-        {items.map(it => (
-          <View key={it.productId} style={styles.itemRow}>
-            <Text style={{ flex: 1 }}>{it.name}</Text>
-            <TextInput
-              style={styles.qtyInput}
-              keyboardType="numeric"
-              value={it.quantity.toFixed(0)}
-              onChangeText={(v) => updateQuantity(it.productId, parseInt(v) || 1)}
-            />
-            <Text>₹{it.total.toFixed(2)}</Text>
-            <Button title="❌" onPress={() => removeItem(it.productId)} />
+            <View>
+            <Text style={styles.label}>Items in Invoice:</Text>
+            {items.map(it => (
+              <View key={it.productId} style={styles.itemRow}>
+                <Text style={{ flex: 1 }}>{it.name}</Text>
+                <View>
+                  <Text>Qty:</Text>
+                  <TextInput
+                    style={styles.qtyInput}
+                    keyboardType="numeric"
+                    value={it.quantity.toFixed(0)}
+                    onChangeText={(v) => {v != '' ? updateQuantity(it.productId, parseInt(v)) || 1 : updateQuantity(it.productId, '')}}
+                  />
+                  <Text>₹{it.total.toFixed(2)}</Text>
+                  <Button title="❌" onPress={() => removeItem(it.productId)} />
+                </View>
+              </View>
+            ))}
+            </View>
+
+            <View style={styles.btnContainer}>
+              <TouchableOpacity
+                style={styles.btnSecondary} 
+                onPress={onReset}
+              >
+                <Text style={styles.label}>Reset</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.btnPrimary}
+                onPress={saveInvoice}
+                disabled={!customerId || !factoryId || items.length === 0 || checkItemsQty()}
+              >
+                <Text style={styles.label}>Save Invoice</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        ))}
-        </View>
-
-        <View style={styles.btnContainer}>
-          <TouchableOpacity
-            style={styles.btnSecondary} 
-            onPress={onReset}
-          >
-            <Text style={styles.label}>Reset</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.btnPrimary}
-            onPress={saveInvoice}
-            disabled={!customerId || !factoryId || items.length === 0}
-          >
-            <Text style={styles.label}>Save Invoice</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
-  scrollView: { flex: 1, alignItems: 'baseline' },
+  scrollView: { flex: 1 },
   content: { flexDirection: 'column' },
   heading: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   label: { fontWeight: 'bold', marginTop: 10 },

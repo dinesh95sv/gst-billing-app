@@ -1,7 +1,7 @@
 import { registerRootComponent } from 'expo';
-import { ExpoRoot } from 'expo-router';
-import React, { useEffect } from 'react';
 import * as MediaLibrary from 'expo-media-library';
+import { ExpoRoot } from 'expo-router';
+import { useEffect } from 'react';
 import { Platform } from 'react-native';
 import { database } from './db/database';
 
@@ -34,27 +34,28 @@ export function App() {
     if (existing.length === 0) {
       await database.write(async () => {
         const product = await productsCollection.create(p => {
-          p.name = 'Dummy Product';
+          p.name = 'Sample Product';
           p.hsn = '1234';
           p.price = 100;
           p.gst_percent = 18;
         });
         const customer = await customersCollection.create(c => {
-          c.name = 'John Doe';
+          c.name = 'DineshKumar S V';
           c.address = '123 Demo Street';
           c.phone = '9876543210';
-          c.email = 'johndoe@example.com';
+          c.email = 'dineshkumar@sample.com';
           c.gstin = '22AAAAA0000A1Z5';
         });
         const factory = await factoriesCollection.create(f => {
           f.name = 'Demo Factory';
-          f.address = 'Industrial Area, City';
+          f.address = 'Industrial Area, City, State';
           f.contact = 'Factory Contact';
           f.gstin = '33BBBBB1111B2Z6';
         });
         await invoicesCollection.create(inv => {
-          inv.invoice_number = 'INV-1000';
-          inv.date = new Date().toISOString().split('T')[0];
+          const dateStr = new Date().toISOString().split('T')[0];
+          inv.invoice_number = `INV-${dateStr}`;
+          inv.date = dateStr;
           inv.customer_id = customer.id;
           inv.factory_id = factory.id;
           inv.items_json = JSON.stringify([{ 

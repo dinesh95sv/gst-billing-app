@@ -1,4 +1,5 @@
 import { withObservables } from '@nozbe/watermelondb/react';
+import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -23,6 +24,11 @@ function CustomersScreenBase({ customers }) {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
+        <StatusBar
+          backgroundColor="#000000"
+          statusBarStyle='light'
+          hidden={false}
+        />
         <ScrollView style={styles.scrollView}>
           <Text style={styles.title}>Customer List</Text>
           {customers.map(cust => (
@@ -72,7 +78,7 @@ export default enhance(CustomersScreenBase);
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
-  scrollView: { flex: 1, alignItems: 'baseline' },
+  scrollView: { flex: 1 },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   card: { 
     flex: 0.2,
