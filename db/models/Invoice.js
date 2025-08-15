@@ -12,7 +12,6 @@ export default class Invoice extends Model {
   @field('items_json') itemsJson;             // JSON stringified array of line items
   @field('gst_breakup') gstBreakup;           // Number, total GST amount
   @field('total') total;                      // Number, invoice gross total
-
   @readonly @date('created_at') createdAt
   @readonly @date('updated_at') updatedAt
 

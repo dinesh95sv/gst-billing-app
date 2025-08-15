@@ -54,7 +54,7 @@ export function App() {
         });
         await invoicesCollection.create(inv => {
           const dateStr = new Date().toISOString().split('T')[0];
-          inv.invoice_number = `INV-${dateStr}`;
+          inv.invoice_number = `INV-${dateStr}-DUMMY`;
           inv.date = dateStr;
           inv.customer_id = customer.id;
           inv.factory_id = factory.id;
