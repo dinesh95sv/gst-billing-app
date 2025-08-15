@@ -2,7 +2,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
-import { Button, RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
@@ -97,7 +97,7 @@ export default function InvoiceForm() {
     const newDate = new Date();
     const hrs = newDate.getHours().toString().padStart(2, "0");
     const mins = newDate.getMinutes().toString().padStart(2, "0");
-    const invoiceNo = `INV-${newDate.getFullYear()}${(newDate.getMonth() + 1)}${newDate.getDate()}${hrs}${mins}`;
+    const invoiceNo = `INV-${newDate.getFullYear()}${((newDate.getMonth() + 1).toString().padStart(2, "0"))}${newDate.getDate()}${hrs}${mins}`;
 
     await database.write(async () => {
       if (existingInvoice) {
@@ -177,11 +177,13 @@ export default function InvoiceForm() {
             </View>
 
             <View>
-            <Text style={styles.label}>Items in Invoice:</Text>
+            {items.length > 0 ? (<Text style={styles.label}>Items in Invoice:</Text>): null}
             {items.map(it => (
               <View key={it.productId} style={styles.itemRow}>
-                <Text style={{ flex: 1 }}>{it.name}</Text>
-                <View style={{ flex: 1}}>
+                <View style={{ flex: 0.6}}>
+                  <Text>{it.name}</Text>
+                </View>
+                <View style={{ flex: 0.4}}>
                   <Text>Qty:</Text>
                   <TextInput
                     style={styles.input}
@@ -190,7 +192,12 @@ export default function InvoiceForm() {
                     onChangeText={(v) => updateQuantity(it.productId, parseInt(v)) || updateQuantity(it.productId, '')}
                   />
                   <Text>₹{it.total.toFixed(2)}</Text>
-                  <Button title="❌" onPress={() => removeItem(it.productId)} />
+                  <TouchableOpacity
+                    style={styles.btnSecondary} 
+                    onPress={() => removeItem(it.productId)}
+                  >
+                    <Text style={styles.label}>❌</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             ))}
@@ -225,6 +232,7 @@ const styles = StyleSheet.create({
   heading: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   label: { fontWeight: 'bold', marginTop: 10 },
   dropdown: { backgroundColor: '#edf4ff', borderWidth:1, borderColor:'#ccc'},
+  itemRow: { flex: 1, flexDirection: 'row' },
   input:{borderWidth:1,borderColor:'#807f7f',backgroundColor:'#edf4ff',color: '#000',marginBottom:10,padding:8,borderRadius:5},
   actions: { justifyContent: 'center', alignItems: 'center' },
   actionBtn: { paddingVertical: 4, paddingHorizontal: 8 },

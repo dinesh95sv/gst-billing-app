@@ -71,7 +71,7 @@ function InvoicesScreenBase({ invoices }) {
           {invoiceList.map(inv => (
             <View key={inv.id} style={styles.card}>
               <View style={styles.details}>
-                <Text style={styles.name}>{inv.invoiceNumber}</Text>
+                <Text style={styles.name}>{inv.invoice_number}</Text>
                 <Text>Date: {inv.date}</Text>
                 <Text>Total: ₹{inv.total.toFixed(2)}</Text>
               </View>
