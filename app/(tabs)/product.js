@@ -19,6 +19,12 @@ function ProductsScreenBase({ products }) {
     })();
   }, [products]);
 
+  React.useEffect(() => {
+    (async () => {
+      setProductsList(await database.collections.get('products').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+    })();
+  }, []);
+
   const deleteProduct = async (product) => {
     Alert.alert('Delete?', 'Confirm delete product?', [
       { text: 'Cancel', style: 'cancel' },

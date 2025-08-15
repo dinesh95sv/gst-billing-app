@@ -23,6 +23,12 @@ function InvoicesScreenBase({ invoices }) {
     })();
   }, [invoices]);
 
+  React.useEffect(() => {
+    (async () => {
+      setInvoicesList(await database.collections.get('invoices').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+    })();
+  }, []);
+
   const deleteInvoice = async (invoice) => {
     Alert.alert('Delete Invoice?', 'Are you sure?', [
       { text: 'Cancel', style: 'cancel' },

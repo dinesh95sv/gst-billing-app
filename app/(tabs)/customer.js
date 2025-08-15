@@ -20,6 +20,12 @@ function CustomersScreenBase({ customers }) {
     })();
   }, [customers]);
 
+  React.useEffect(() => {
+    (async () => {
+      setCustomersList(await database.collections.get('customers').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+    })();
+  }, []);
+
   const handleDelete = (customer) => {
     Alert.alert('Delete Customer?', 'Are you sure you want to delete this customer?', [
       { text: 'Cancel', style: 'cancel' },

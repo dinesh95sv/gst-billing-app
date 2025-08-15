@@ -21,6 +21,12 @@ function FactoriesScreenBase({ factories }) {
     })();
   }, [factories]);
 
+  React.useEffect(() => {
+    (async () => {
+      setFactoriesList(await database.collections.get('factories').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+    })();
+  }, []);
+
   const handleDelete = (factory) => {
     Alert.alert(
       'Delete Factory?',
