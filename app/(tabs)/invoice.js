@@ -3,6 +3,7 @@ import { withObservables } from '@nozbe/watermelondb/react';
 import { useNavigation } from '@react-navigation/native';
 import * as Sharing from 'expo-sharing';
 import { StatusBar } from 'expo-status-bar';
+import React from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
@@ -14,11 +15,18 @@ function InvoicesScreenBase({ invoices }) {
 
   // const [modalVisible, setModalVisible] = React.useState(false);
   // const [editing, setEditing] = React.useState(null);
+  const [invoiceList, setInvoicesList] = React.useState([]);
+
+  React.useEffect(() => {
+    (async () => {
+      setInvoicesList(await database.collections.get('invoices').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+    })();
+  }, [invoices]);
 
   const deleteInvoice = async (invoice) => {
     Alert.alert('Delete Invoice?', 'Are you sure?', [
-      { text: 'Cancel' },
-      { text: 'Yes', onPress: async () => {
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Yes', style: 'destructive', onPress: async () => {
         try {
           await database.write(async () => { await invoice.destroyPermanently(); });
         } catch (err) {
@@ -53,7 +61,7 @@ function InvoicesScreenBase({ invoices }) {
         />
         <ScrollView style={styles.scrollView}>
           <Text style={styles.title}>Invoices</Text>
-          {invoices.map(inv => (
+          {invoiceList.map(inv => (
             <View key={inv.id} style={styles.card}>
               <View style={styles.details}>
                 <Text style={styles.name}>{inv.invoiceNumber}</Text>
@@ -97,7 +105,7 @@ function InvoicesScreenBase({ invoices }) {
 }
 
 const enhance = withObservables([], () => ({
-  invoices: database.collections.get('invoices').query(Q.sortBy('updatedAt', Q.desc)).observe()
+  invoices: database.collections.get('invoices').query().observe()
 }));
 export default enhance(InvoicesScreenBase);
 

@@ -6,11 +6,20 @@ import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } fr
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import FactoryForm from '../../components/FactoryForm';
 import { database } from '../../db/database';
+import { showToast } from '../../utils/utils';
 
 // Base functional screen component
 function FactoriesScreenBase({ factories }) {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editingFactory, setEditingFactory] = React.useState(null);
+
+  const [factoriesList, setFactoriesList] = React.useState([]);
+
+  React.useEffect(() => {
+    (async () => {
+      setFactoriesList(await database.collections.get('factories').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+    })();
+  }, [factories]);
 
   const handleDelete = (factory) => {
     Alert.alert(
@@ -22,9 +31,11 @@ function FactoriesScreenBase({ factories }) {
           text: 'Yes', 
           style: 'destructive',
           onPress: async () => {
-            await database.write(async () => {
-              await factory.destroyPermanently();
-            });
+            try {
+              await database.write(async () => { await factory.destroyPermanently(); });
+            } catch (err) {
+              showToast('Error Deleting Factory!');
+            }
           }
         }
       ]
@@ -41,7 +52,7 @@ function FactoriesScreenBase({ factories }) {
         />
         <ScrollView style={styles.scrollView}>
           <Text style={styles.title}>Factories</Text>
-          {factories.map(fac => (
+          {factoriesList.map(fac => (
             <View key={fac.id} style={styles.card}>
               <View style={styles.details}>
                 <Text style={styles.name}>{fac.name}</Text>
@@ -93,7 +104,7 @@ function FactoriesScreenBase({ factories }) {
 
 // Enhance with WatermelonDB reactive data
 const enhance = withObservables([], () => ({
-  factories: database.collections.get('factories').query(Q.sortBy('updatedAt', Q.desc)).observe(),
+  factories: database.collections.get('factories').query().observe(),
 }));
 
 export default enhance(FactoriesScreenBase);

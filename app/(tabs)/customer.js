@@ -6,18 +6,29 @@ import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } fr
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import CustomerForm from '../../components/CustomerForm';
 import { database } from '../../db/database';
+import { showToast } from '../../utils/utils';
 
 function CustomersScreenBase({ customers }) {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editingCustomer, setEditingCustomer] = React.useState(null);
 
+  const [customersList, setCustomersList] = React.useState([]);
+
+  React.useEffect(() => {
+    (async () => {
+      setCustomersList(await database.collections.get('customers').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+    })();
+  }, [customers]);
+
   const handleDelete = (customer) => {
-    Alert.alert('Delete?', 'Confirm delete?', [
-      { text: 'Cancel' },
-      { text: 'Yes', onPress: async () => {
-        await database.write(async () => {
-          await customer.destroyPermanently();
-        });
+    Alert.alert('Delete Customer?', 'Are you sure you want to delete this customer?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Yes', style: 'destructive', onPress: async () => {
+        try {
+          await database.write(async () => { await customer.destroyPermanently(); });
+        } catch (err) {
+          showToast('Error Deleting Customer!');
+        }
       }}
     ]);
   };
@@ -32,7 +43,7 @@ function CustomersScreenBase({ customers }) {
         />
         <ScrollView style={styles.scrollView}>
           <Text style={styles.title}>Customer List</Text>
-          {customers.map(cust => (
+          {customersList.map(cust => (
             <View key={cust.id} style={styles.card}>
               <View style={styles.details}>
                 <Text style={styles.name}>{cust.name}</Text>
@@ -73,7 +84,7 @@ function CustomersScreenBase({ customers }) {
 }
 
 const enhance = withObservables([], () => ({
-  customers: database.collections.get('customers').query(Q.sortBy('updatedAt', Q.desc)).observe(),
+  customers: database.collections.get('customers').query().observe(),
 }));
 export default enhance(CustomersScreenBase);
 

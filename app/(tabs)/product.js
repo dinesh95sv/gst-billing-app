@@ -11,11 +11,18 @@ import { showToast } from '../../utils/utils';
 function ProductsScreenBase({ products }) {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editing, setEditing] = React.useState(null);
+  const [productsList, setProductsList] = React.useState([]);
+
+  React.useEffect(() => {
+    (async () => {
+      setProductsList(await database.collections.get('products').query(Q.sortBy('updatedAt', Q.desc)).fetch())
+    })();
+  }, [products]);
 
   const deleteProduct = async (product) => {
     Alert.alert('Delete?', 'Confirm delete product?', [
-      { text: 'Cancel' },
-      { text: 'Yes', onPress: async () => {
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Yes', style: 'destructive', onPress: async () => {
         try {
           await database.write(async () => { await product.destroyPermanently(); });
         } catch (err) {
@@ -35,7 +42,7 @@ function ProductsScreenBase({ products }) {
         />
         <ScrollView style={styles.scrollView}>
           <Text style={styles.title}>Products</Text>
-          {products.map(prod => (
+          {productsList.map(prod => (
             <View key={prod.id} style={styles.card}>
               <View style={styles.details}>
                 <Text style={styles.name}>{prod.name}</Text>
@@ -76,7 +83,7 @@ function ProductsScreenBase({ products }) {
   );
 }
 const enhance = withObservables([], () => ({
-  products: database.collections.get('products').query(Q.sortBy('updatedAt', Q.desc)).observe()
+  products: database.collections.get('products').query().observe()
 }));
 export default enhance(ProductsScreenBase);
 const styles = StyleSheet.create({
