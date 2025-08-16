@@ -31,9 +31,13 @@ export default function CustomerForm({ existingCustomer, onClose }) {
 
   return (
     <View style={styles.modalContainer}>
+      <Text style={styles.label}>Name</Text>
       <TextInput placeholder="Name" value={name} onChangeText={setName} style={styles.input} />
+      <Text style={styles.label}>Address</Text>
       <TextInput placeholder="Address" value={address} multiline={true} numberOfLines={4} onChangeText={setAddress} style={styles.inputMultiline} />
+      <Text style={styles.label}>Contact</Text>
       <TextInput placeholder="Contact" value={contact} inputMode="numeric" maxLength={10} onChangeText={setContact} style={styles.input} />
+      <Text style={styles.label}>GSTIN</Text>
       <TextInput placeholder="GSTIN" value={gstin} onChangeText={setGstin} style={styles.input} />
       {/* <Button title="Save" onPress={saveFactory} />
       <Button title="Cancel" onPress={onClose} color="grey" /> */}
@@ -56,9 +60,10 @@ export default function CustomerForm({ existingCustomer, onClose }) {
 }
 const styles = StyleSheet.create({
   modalContainer:{flex: 1, padding:20, backgroundColor:'#80eded', color: '#000'},
+  label: { fontWeight: 'bold', marginTop: 10, color: '#000' },
   input:{borderWidth:1,borderColor:'#807f7f',backgroundColor:'#edf4ff',color: '#000',marginBottom:10,padding:8,borderRadius:5},
   inputMultiline:{borderWidth:1,borderColor:'#807f7f',backgroundColor:'#edf4ff',color: '#000', textAlignVertical: 'top', marginBottom:10,padding:8,borderRadius:5},
-  btnContainer: { flex: 1, alignItems: 'flex-end', justifyContent: 'right' },
+  btnContainer: { flex: 1, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'right' },
   btnPrimary: {
     paddingVertical: 12,
     paddingHorizontal: 16,

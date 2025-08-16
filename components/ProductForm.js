@@ -31,9 +31,13 @@ export default function ProductForm({ existingProduct, onClose }) {
 
   return (
     <View style={styles.modalContainer}>
+      <Text style={styles.label}>Product Name</Text>
       <TextInput placeholder="Product Name" value={name} onChangeText={setName} style={styles.input} />
+      <Text style={styles.label}>HSN Code</Text>
       <TextInput placeholder="HSN" value={hsn} onChangeText={setHsn} style={styles.input} />
+      <Text style={styles.label}>Price</Text>
       <TextInput placeholder="Price" inputMode="decimal" value={price} onChangeText={setPrice} style={styles.input} />
+      <Text style={styles.label}>GST %</Text>
       <TextInput placeholder="GST %" inputMode="numeric" value={gstPercent} onChangeText={setGstPercent} style={styles.input} />
       {/* <Button title="Save" onPress={saveProduct} />
       <Button title="Cancel" onPress={onClose} color="grey" /> */}
@@ -56,8 +60,9 @@ export default function ProductForm({ existingProduct, onClose }) {
 }
 const styles = StyleSheet.create({
   modalContainer:{flex: 1, padding:20, backgroundColor:'#80eded', color: '#000'},
+  label: { fontWeight: 'bold', marginTop: 10, color: '#000' },
   input:{borderWidth:1,borderColor:'#807f7f',backgroundColor:'#edf4ff',color: '#000',marginBottom:10,padding:8,borderRadius:5},
-  btnContainer: { flex: 1, alignItems: 'flex-end', justifyContent: 'right' },
+  btnContainer: { flex: 1, flexDirection: 'row' ,alignItems: 'flex-end', justifyContent: 'right' },
   btnPrimary: {
     paddingVertical: 12,
     paddingHorizontal: 16,

@@ -44,8 +44,7 @@ function ProductsScreenBase({ products }) {
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <StatusBar
-          backgroundColor="#000000"
-          statusBarStyle='light'
+          style="light"
           hidden={false}
         />
         <ScrollView style={styles.scrollView}>
@@ -115,7 +114,7 @@ const styles = StyleSheet.create({
   actions: { flex: 0.2, justifyContent: 'center', alignItems: 'flex-end' },
   actionBtn: { paddingVertical: 4, paddingHorizontal: 8 },
   actionText: { color: 'blue', fontWeight: '500' },
-  btnContainer: { flex: 1, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'right' },
+  btnContainer: { flex: 1, flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'right' },
   btnPrimary: {
     paddingVertical: 12,
     paddingHorizontal: 16,

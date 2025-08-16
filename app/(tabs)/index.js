@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
-import { useNavigation } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -8,12 +8,12 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
 
-export default function InvoiceForm({ route }) {
+export default function InvoiceForm() {
     const navigation = useNavigation();
-    // const route = useRouter();
-    // const existingInvoice = route?.params?.existingInvoice || null;
+    const router = useRouter();
+    const existingInvoice = router?.params?.existingInvoice || null;
 
-  const [existingInvoice, setExistingInvoice] = useState(route?.params?.existingInvoice || null);
+  // const [existingInvoice, setExistingInvoice] = useState(route?.params?.existingInvoice || null);
   const [customers, setCustomers] = useState([]);
   const [factories, setFactories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -54,10 +54,10 @@ export default function InvoiceForm({ route }) {
   }, []);
 
   const updateQuantity = (productId, qty) => {
-    if (qty !== '') {
+    if (qty !== 0) {
       setItems(items.map(it => it.productId === productId ? { ...it, quantity: qty, total: ((it.price * qty) + ((it.price * qty) * it.gstPercent / 100)) } : it));
     } else {
-      setItems(items.map(it => it.productId === productId ? { ...it, quantity: ''} : it));
+      setItems(items.map(it => it.productId === productId ? { ...it, quantity: 0, total: 0} : it));
     }
   };
 
@@ -104,9 +104,13 @@ export default function InvoiceForm({ route }) {
     const total = items.reduce((acc, it) => acc + it.total, 0);
     // const invoiceNo = `INV-${Date.now().toString().slice(-6)}`;
     const newDate = new Date();
+    const monthNo = newDate.getMonth() + 1;
+    const year = newDate.getFullYear().toString();
+    const month = monthNo.toString().padStart(2, "0");
+    const date = newDate.getDate().padStart(2, "0");
     const hrs = newDate.getHours().toString().padStart(2, "0");
     const mins = newDate.getMinutes().toString().padStart(2, "0");
-    const invoiceNo = `INV-${newDate.getFullYear()}${((newDate.getMonth() + 1).toString().padStart(2, "0"))}${newDate.getDate()}${hrs}${mins}`;
+    const invoiceNo = `INV-${year}${month}${date}${hrs}${mins}`;
 
     await database.write(async () => {
       if (existingInvoice) {
@@ -131,7 +135,7 @@ export default function InvoiceForm({ route }) {
         });
       }
     });
-    navigation.navigate('invoice');
+    navigation.push('invoice');
   };
 
   const onReset = () => {
@@ -145,8 +149,7 @@ export default function InvoiceForm({ route }) {
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <StatusBar
-          backgroundColor="#000000"
-          statusBarStyle='light'
+          style="light"
           hidden={false}
         />
         <ScrollView
@@ -189,18 +192,19 @@ export default function InvoiceForm({ route }) {
             {items.length > 0 ? (<Text style={styles.label}>Items in Invoice:</Text>): null}
             {items.map(it => (
               <View key={it.productId} style={styles.itemRow}>
-                <View style={{ flex: 0.6}}>
-                  <Text>{it.name}</Text>
-                </View>
-                <View style={{ flex: 0.4}}>
-                  <Text>Qty:</Text>
-                  <TextInput
-                    style={styles.input}
-                    keyboardType="numeric"
-                    value={it.quantity.toFixed(0)}
-                    onChangeText={(v) => updateQuantity(it.productId, parseInt(v)) || updateQuantity(it.productId, '')}
-                  />
-                  <Text>₹{it.total.toFixed(2)}</Text>
+                <View>
+                  <View style={{ flex: 0.6}}>
+                    <Text style={ styles.label }>{it.name}</Text>
+                  </View>
+                  <View style={{ flex: 0.4 }}>
+                    <Text>Qty:</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={it.quantity.toFixed(0)}
+                      onChangeText={(v) => updateQuantity(it.productId, (parseInt(v) || 0))}
+                    />
+                    <Text>₹{it.total.toFixed(2)}</Text>
+                  </View>
                 </View>
                 <View style={styles.btnContainer}>
                   <TouchableOpacity
@@ -288,7 +292,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     backgroundColor: '#bdbdbd',
-    borderRadius: 25,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 8,

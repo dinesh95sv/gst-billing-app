@@ -53,9 +53,9 @@ function InvoicesScreenBase({ invoices }) {
 
   const redirectToCreateInvoice = (inv) => {
     if (inv != null) {
-      navigation.navigate('index', {existingInvoice: inv});
+      navigation.push('index', {existingInvoice: inv});
     } else {
-      navigation.navigate('index');
+      navigation.push('index');
     }
   }
 
@@ -63,14 +63,16 @@ function InvoicesScreenBase({ invoices }) {
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <StatusBar
-          backgroundColor="#000000"
-          statusBarStyle='light'
+          style="light"
           hidden={false}
         />
         <ScrollView style={styles.scrollView}>
           <Text style={styles.title}>Invoices</Text>
           {invoiceList.map(inv => (
             <View key={inv.id} style={styles.card}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.name}>{inv.invoice_number}</Text>
+              </View>
               <View style={styles.details}>
                 <Text style={styles.name}>{inv.invoice_number}</Text>
                 <Text>Date: {inv.date}</Text>
@@ -127,7 +129,8 @@ const styles = StyleSheet.create({
   card: { 
     flex: 0.2,
     flexDirection: 'row',
-    backgroundColor: '#f7f7f7', 
+    backgroundColor: '#f7f7f7',
+    color: '#000',
     padding: 10, 
     marginVertical: 5, 
     border: '.5px solid #ddd', 
@@ -138,12 +141,12 @@ const styles = StyleSheet.create({
   actions: { flex: 0.2, justifyContent: 'center', alignItems: 'flex-end' },
   actionBtn: { paddingVertical: 4, paddingHorizontal: 8 },
   actionText: { color: 'blue', fontWeight: '500' },
-  btnContainer: { flex: 1, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'right' },
+  btnContainer: { flex: 1, flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'right' },
   btnPrimary: {
     paddingVertical: 12,
     paddingHorizontal: 16,
     backgroundColor: '#39e39f',
-    borderRadius: 25,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 8,
