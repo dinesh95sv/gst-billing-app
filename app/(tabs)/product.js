@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { withObservables } from '@nozbe/watermelondb/react';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
@@ -61,13 +62,15 @@ function ProductsScreenBase({ products }) {
                   style={styles.actionBtn} 
                   onPress={() => { setEditing(prod); setModalVisible(true); }}
                 >
-                  <Text style={styles.actionText}>Edit</Text>
+                  {/* <Text style={styles.actionText}>Edit</Text> */}
+                  <Ionicons name="pencil" size={24} color="blue" />
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.actionBtn} 
                   onPress={() => deleteProduct(prod)}
                 >
-                  <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text>
+                  {/* <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text> */}
+                  <Ionicons name="trash-bin" size={24} color="red" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -79,7 +82,8 @@ function ProductsScreenBase({ products }) {
             style={styles.btnPrimary} 
             onPress={() => { setEditing(null); setModalVisible(true); }}
           >
-            <Text style={styles.label}>Add Product</Text>
+            {/* <Text style={styles.label}>Add Product</Text> */}
+            <Ionicons name="add-outline" size={24} color="white" />
           </TouchableOpacity>
         </View>
         <Modal visible={modalVisible}>
@@ -111,7 +115,7 @@ const styles = StyleSheet.create({
   actions: { flex: 0.2, justifyContent: 'center', alignItems: 'flex-end' },
   actionBtn: { paddingVertical: 4, paddingHorizontal: 8 },
   actionText: { color: 'blue', fontWeight: '500' },
-  btnContainer: { display: 'flex', alignItems: 'flex-end', justifyContent: 'right' },
+  btnContainer: { flex: 1, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'right' },
   btnPrimary: {
     paddingVertical: 12,
     paddingHorizontal: 16,

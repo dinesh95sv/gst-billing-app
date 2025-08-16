@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { withObservables } from '@nozbe/watermelondb/react';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
@@ -72,13 +73,15 @@ function FactoriesScreenBase({ factories }) {
                   style={styles.actionBtn} 
                   onPress={() => { setEditingFactory(fac); setModalVisible(true); }}
                 >
-                  <Text style={styles.actionText}>Edit</Text>
+                  {/* <Text style={styles.actionText}>Edit</Text> */}
+                  <Ionicons name="pencil" size={24} color="blue" />
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.actionBtn} 
                   onPress={() => handleDelete(fac)}
                 >
-                  <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text>
+                  {/* <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text> */}
+                  <Ionicons name="trash-bin" size={24} color="red" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -94,7 +97,7 @@ function FactoriesScreenBase({ factories }) {
             style={styles.btnPrimary} 
             onPress={() => { setEditingFactory(null); setModalVisible(true); }}
           >
-            <Text style={styles.label}>Add Factory</Text>
+            <Ionicons name="add-outline" size={24} color="white" />
           </TouchableOpacity>
         </View>
         {/* Add/Edit Modal */}
@@ -134,12 +137,12 @@ const styles = StyleSheet.create({
   actions: { flex: 0.2, justifyContent: 'center', alignItems: 'flex-end' },
   actionBtn: { paddingVertical: 4, paddingHorizontal: 8 },
   actionText: { color: 'blue', fontWeight: '500' },
-  btnContainer: { display: 'flex', alignItems: 'flex-end', justifyContent: 'right' },
+  btnContainer: { flex: 1, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'right' },
   btnPrimary: {
     paddingVertical: 12,
     paddingHorizontal: 16,
     backgroundColor: '#39e39f',
-    borderRadius: 8,
+    borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 8,

@@ -1,5 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
-import { useNavigation, useRouter } from 'expo-router';
+import { useNavigation } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -7,11 +8,12 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
 
-export default function InvoiceForm() {
+export default function InvoiceForm({ route }) {
     const navigation = useNavigation();
-    const route = useRouter();
-    const existingInvoice = route?.params?.existingInvoice || null;
+    // const route = useRouter();
+    // const existingInvoice = route?.params?.existingInvoice || null;
 
+  const [existingInvoice, setExistingInvoice] = useState(route?.params?.existingInvoice || null);
   const [customers, setCustomers] = useState([]);
   const [factories, setFactories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -30,6 +32,13 @@ export default function InvoiceForm() {
       setProducts(await database.collections.get('products').query().fetch());
     })();
   }, []);
+
+  useEffect(() => {
+    setCustomerId(existingInvoice?.customer_id || '');
+    setFactoryId(existingInvoice?.factory_id || '');
+    setDate(existingInvoice?.date || new Date().toISOString().split('T')[0]);
+    setItems(existingInvoice ? JSON.parse(existingInvoice.items_json) : []);
+  }, [existingInvoice])
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -192,11 +201,14 @@ export default function InvoiceForm() {
                     onChangeText={(v) => updateQuantity(it.productId, parseInt(v)) || updateQuantity(it.productId, '')}
                   />
                   <Text>₹{it.total.toFixed(2)}</Text>
+                </View>
+                <View style={styles.btnContainer}>
                   <TouchableOpacity
                     style={styles.btnSecondary} 
                     onPress={() => removeItem(it.productId)}
                   >
-                    <Text style={styles.label}>❌</Text>
+                    {/* <Text style={styles.label}>❌</Text> */}
+                    <Ionicons name="close-sharp" size={24} color="red" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -258,7 +270,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   btnContainer: {
-    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
     alignItems: 'flex-end',
     justifyContent: 'right'
   },
@@ -266,7 +279,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     backgroundColor: '#39e39f',
-    borderRadius: 8,
+    borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 8,
@@ -275,7 +288,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     backgroundColor: '#bdbdbd',
-    borderRadius: 8,
+    borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 8,

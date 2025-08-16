@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { withObservables } from '@nozbe/watermelondb/react';
 import { useNavigation } from '@react-navigation/native';
 import * as Sharing from 'expo-sharing';
@@ -80,19 +81,22 @@ function InvoicesScreenBase({ invoices }) {
                   style={styles.actionBtn} 
                   onPress={() => shareInvoice(inv)}
                 >
-                  <Text style={[styles.actionText, { color: 'green' }]}>Share</Text>
+                  {/* <Text style={[styles.actionText, { color: 'green' }]}>Share</Text> */}
+                  <Ionicons name="share" size={24} color="green" />
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.actionBtn} 
                   onPress={() => { redirectToCreateInvoice(inv) }}
                 >
-                  <Text style={styles.actionText}>Edit</Text>
+                  {/* <Text style={styles.actionText}>Edit</Text> */}
+                  <Ionicons name="pencil" size={24} color="blue" />
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.actionBtn} 
                   onPress={() => deleteInvoice(inv)}
                 >
-                  <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text>
+                  {/* <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text> */}
+                  <Ionicons name="trash-bin" size={24} color="red" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -103,7 +107,7 @@ function InvoicesScreenBase({ invoices }) {
             style={styles.btnPrimary} 
             onPress={() => redirectToCreateInvoice(null) }
           >
-            <Text style={styles.label}>Create New Invoice</Text>
+            <Ionicons name="add-outline" size={24} color="white" />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -134,12 +138,12 @@ const styles = StyleSheet.create({
   actions: { flex: 0.2, justifyContent: 'center', alignItems: 'flex-end' },
   actionBtn: { paddingVertical: 4, paddingHorizontal: 8 },
   actionText: { color: 'blue', fontWeight: '500' },
-  btnContainer: { display: 'flex', alignItems: 'flex-end', justifyContent: 'right' },
+  btnContainer: { flex: 1, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'right' },
   btnPrimary: {
     paddingVertical: 12,
     paddingHorizontal: 16,
     backgroundColor: '#39e39f',
-    borderRadius: 8,
+    borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 8,

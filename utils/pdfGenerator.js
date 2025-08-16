@@ -243,7 +243,7 @@ export async function generateInvoicePDF(invoice) {
       const { uri } = await Print.printToFileAsync({ html: htmlContent });
       
       // Create filename with timestamp
-      const fileName = `${invoice.invoiceNumber}.pdf`;
+      const fileName = `${invoice.invoice_number}.pdf`;
       
       // Save to device storage
       const savedPath = await savePDFToDevice(uri, fileName);
