@@ -39,7 +39,7 @@ export default function InvoiceForm({ route }) {
     setFactoryId(existingInvoice?.factory_id || '');
     setDate(existingInvoice?.date || new Date().toISOString().split('T')[0]);
     setItems(existingInvoice ? JSON.parse(existingInvoice.items_json) : []);
-  }, [route, isFocused]);
+  }, [route, existingInvoice, isFocused]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
