@@ -8,10 +8,11 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
 
-export default function InvoiceForm() {
+export default function InvoiceForm({ route }) {
     const navigation = useNavigation();
+    const isFocused = navigation.isFocused();
     const router = useRouter();
-    const existingInvoice = router?.params?.existingInvoice || null;
+    const existingInvoice = route?.params?.existingInvoice || null;
 
   // const [existingInvoice, setExistingInvoice] = useState(route?.params?.existingInvoice || null);
   const [customers, setCustomers] = useState([]);
@@ -38,7 +39,7 @@ export default function InvoiceForm() {
     setFactoryId(existingInvoice?.factory_id || '');
     setDate(existingInvoice?.date || new Date().toISOString().split('T')[0]);
     setItems(existingInvoice ? JSON.parse(existingInvoice.items_json) : []);
-  }, [existingInvoice])
+  }, [route, isFocused]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -135,7 +136,7 @@ export default function InvoiceForm() {
         });
       }
     });
-    navigation.push('invoice');
+    navigation.navigate('invoice');
   };
 
   const onReset = () => {

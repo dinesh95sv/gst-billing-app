@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { withObservables } from '@nozbe/watermelondb/react';
+import { useNavigation } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -9,6 +10,9 @@ import { database } from '../../db/database';
 import { showToast } from '../../utils/utils';
 
 function ProductsScreenBase({ products }) {
+  const navigation = useNavigation();
+  const isFocused = navigation.isFocused();
+
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editing, setEditing] = React.useState(null);
   const [productsList, setProductsList] = React.useState([]);
@@ -18,7 +22,7 @@ function ProductsScreenBase({ products }) {
       const productsData = await database.collections.get('products').query().fetch();
       setProductsList([ ...productsData ]);
     })();
-  }, [products]);
+  }, [products, isFocused]);
 
   React.useEffect(() => {
     (async () => {

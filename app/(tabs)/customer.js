@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { withObservables } from '@nozbe/watermelondb/react';
+import { useNavigation } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -9,6 +10,8 @@ import { database } from '../../db/database';
 import { callMobile, showToast } from '../../utils/utils';
 
 function CustomersScreenBase({ customers }) {
+  const navigation = useNavigation();
+  const isFocused = navigation.isFocused();
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editingCustomer, setEditingCustomer] = React.useState(null);
 
@@ -19,7 +22,7 @@ function CustomersScreenBase({ customers }) {
       const customerData = await database.collections.get('customers').query().fetch();
       setCustomersList([ ...customerData ]);
     })();
-  }, [customers]);
+  }, [customers, isFocused]);
 
   React.useEffect(() => {
     (async () => {

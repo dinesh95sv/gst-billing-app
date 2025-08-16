@@ -12,6 +12,8 @@ import { showToast } from '../../utils/utils';
 
 function InvoicesScreenBase({ invoices }) {
   const navigation = useNavigation();
+  const isFocused = navigation.isFocused();
+  
 
   // const [modalVisible, setModalVisible] = React.useState(false);
   // const [editing, setEditing] = React.useState(null);
@@ -22,7 +24,7 @@ function InvoicesScreenBase({ invoices }) {
       const invoiceData = await database.collections.get('invoices').query().fetch();
       setInvoicesList([ ...invoiceData ]);
     })();
-  }, [invoices]);
+  }, [invoices, isFocused]);
 
   React.useEffect(() => {
     (async () => {
@@ -53,9 +55,9 @@ function InvoicesScreenBase({ invoices }) {
 
   const redirectToCreateInvoice = (inv) => {
     if (inv != null) {
-      navigation.push('index', {existingInvoice: inv});
+      navigation.navigate('index', { existingInvoice: inv });
     } else {
-      navigation.push('index');
+      navigation.navigate('index');
     }
   }
 

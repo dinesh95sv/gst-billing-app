@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { withObservables } from '@nozbe/watermelondb/react';
+import { useNavigation } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -10,6 +11,8 @@ import { showToast } from '../../utils/utils';
 
 // Base functional screen component
 function FactoriesScreenBase({ factories }) {
+  const navigation = useNavigation();
+  const isFocused = navigation.isFocused();
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editingFactory, setEditingFactory] = React.useState(null);
 
@@ -20,7 +23,7 @@ function FactoriesScreenBase({ factories }) {
       const factoryData = await database.collections.get('factories').query().fetch();
       setFactoriesList([ ...factoryData ]);
     })();
-  }, [factories]);
+  }, [factories, isFocused]);
 
   React.useEffect(() => {
     (async () => {
