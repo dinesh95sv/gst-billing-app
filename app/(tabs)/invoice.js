@@ -12,7 +12,6 @@ import { showToast } from '../../utils/utils';
 
 function InvoicesScreenBase({ invoices }) {
   const navigation = useNavigation();
-  const isFocused = navigation.isFocused();
   
 
   // const [modalVisible, setModalVisible] = React.useState(false);
@@ -20,11 +19,12 @@ function InvoicesScreenBase({ invoices }) {
   const [invoiceList, setInvoicesList] = React.useState([]);
 
   React.useEffect(() => {
-    (async () => {
+    const unsubscribe = navigation.addListener('focus', async () => {
       const invoiceData = await database.collections.get('invoices').query().fetch();
       setInvoicesList([ ...invoiceData ]);
-    })();
-  }, [invoices, isFocused]);
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   React.useEffect(() => {
     (async () => {
@@ -55,7 +55,7 @@ function InvoicesScreenBase({ invoices }) {
 
   const redirectToCreateInvoice = (inv) => {
     if (inv != null) {
-      navigation.navigate('index', { existingInvoice: inv });
+      navigation.navigate('index', { existingInvoice: inv.invoice_number });
     } else {
       navigation.navigate('index');
     }
@@ -76,7 +76,6 @@ function InvoicesScreenBase({ invoices }) {
                 <Text style={styles.name}>{inv.invoice_number}</Text>
               </View>
               <View style={styles.details}>
-                <Text style={styles.name}>{inv.invoice_number}</Text>
                 <Text>Date: {inv.date}</Text>
                 <Text>Total: ₹{inv.total.toFixed(2)}</Text>
               </View>
@@ -90,7 +89,7 @@ function InvoicesScreenBase({ invoices }) {
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.actionBtn} 
-                  onPress={() => { redirectToCreateInvoice(inv) }}
+                  onPress={() => { redirectToCreateInvoice(inv.invoice_number) }}
                 >
                   {/* <Text style={styles.actionText}>Edit</Text> */}
                   <Ionicons name="pencil" size={24} color="blue" />
@@ -126,7 +125,7 @@ export default enhance(InvoicesScreenBase);
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
-  scrollView: { flex: 1 },
+  scrollView: { flex: 10 },
   title: { fontSize: 20, fontWeight: 'bold' },
   card: { 
     flex: 0.2,

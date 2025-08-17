@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { Q } from '@nozbe/watermelondb';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -10,11 +11,10 @@ import { database } from '../../db/database';
 
 export default function InvoiceForm({ route }) {
     const navigation = useNavigation();
-    const isFocused = navigation.isFocused();
     const router = useRouter();
-    const existingInvoice = route?.params?.existingInvoice || null;
+    const invoiceNumber = route?.params?.existingInvoice || null;
 
-  // const [existingInvoice, setExistingInvoice] = useState(route?.params?.existingInvoice || null);
+  const [existingInvoice, setExistingInvoice] = useState({});
   const [customers, setCustomers] = useState([]);
   const [factories, setFactories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -35,11 +35,23 @@ export default function InvoiceForm({ route }) {
   }, []);
 
   useEffect(() => {
-    setCustomerId(existingInvoice?.customer_id || '');
-    setFactoryId(existingInvoice?.factory_id || '');
-    setDate(existingInvoice?.date || new Date().toISOString().split('T')[0]);
-    setItems(existingInvoice ? JSON.parse(existingInvoice.items_json) : []);
-  }, [route, existingInvoice, isFocused]);
+    const unsubscribe = navigation.addListener('focus', async () => {
+        if (invoiceNumber !== null) {
+          const invoiceDetail = await database.collections.get('invoices').query(Q.where('invoice_number', invoiceNumber)).fetch()[0] || null;
+          setExistingInvoice(invoiceDetail);
+          setCustomerId(invoiceDetail?.customer_id || '');
+          setFactoryId(invoiceDetail?.factory_id || '');
+          setDate(invoiceDetail?.date || new Date().toISOString().split('T')[0]);
+          setItems(invoiceDetail ? [ ...JSON.parse(invoiceDetail.items_json) ] : []);
+        } else {
+          setCustomers(await database.collections.get('customers').query().fetch());
+          setFactories(await database.collections.get('factories').query().fetch());
+          setProducts(await database.collections.get('products').query().fetch());
+        };
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -51,7 +63,7 @@ export default function InvoiceForm({ route }) {
     loadData();
     setTimeout(() => {
     setRefreshing(false);
-    }, 2000);
+    }, 500);
   }, []);
 
   const updateQuantity = (productId, qty) => {
@@ -61,18 +73,6 @@ export default function InvoiceForm({ route }) {
       setItems(items.map(it => it.productId === productId ? { ...it, quantity: 0, total: 0} : it));
     }
   };
-
-  const checkItemsQty = () => {
-    let err = false;
-    if (items.length > 0) {
-      items.forEach(item => {
-        if (item.quantity === '' || item.quantity < 1) err = true;
-      });
-      return err;
-    }
-    err = true;
-    return err;
-  }
 
   const removeItem = (productId) => {
     setItems(items.filter(it => it.productId !== productId));
@@ -105,7 +105,7 @@ export default function InvoiceForm({ route }) {
     const total = items.reduce((acc, it) => acc + it.total, 0);
     // const invoiceNo = `INV-${Date.now().toString().slice(-6)}`;
     const newDate = new Date();
-    const monthNo = newDate.getMonth() + 1;
+    const monthNo = 1 + (newDate.getMonth() || 0);
     const year = newDate.getFullYear().toString();
     const month = monthNo.toString().padStart(2, "0");
     const date = newDate.getDate().padStart(2, "0");
@@ -230,7 +230,7 @@ export default function InvoiceForm({ route }) {
               <TouchableOpacity
                 style={styles.btnPrimary}
                 onPress={saveInvoice}
-                disabled={!customerId || !factoryId || items.length === 0 || checkItemsQty()}
+                disabled={!customerId || !factoryId || items.length === 0 || items.filter(item => item.quantity === 0).length > 0}
               >
                 <Text style={styles.label}>Save Invoice</Text>
               </TouchableOpacity>

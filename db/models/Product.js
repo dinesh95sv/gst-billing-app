@@ -8,6 +8,6 @@ export default class Product extends Model {
   @field('hsn') hsn;
   @field('price') price;
   @field('gst_percent') gstPercent;
-  @readonly @date('created_at') createdAt
-  @readonly @date('updated_at') updatedAt
+  @readonly @date('created_at') createdAt;
+  @readonly @date('updated_at') updatedAt;
 }

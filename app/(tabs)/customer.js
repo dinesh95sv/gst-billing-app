@@ -11,18 +11,18 @@ import { callMobile, showToast } from '../../utils/utils';
 
 function CustomersScreenBase({ customers }) {
   const navigation = useNavigation();
-  const isFocused = navigation.isFocused();
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editingCustomer, setEditingCustomer] = React.useState(null);
 
   const [customersList, setCustomersList] = React.useState([]);
 
   React.useEffect(() => {
-    (async () => {
+    const unsubscribe = navigation.addListener('focus', async () => {
       const customerData = await database.collections.get('customers').query().fetch();
       setCustomersList([ ...customerData ]);
-    })();
-  }, [customers, isFocused]);
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   React.useEffect(() => {
     (async () => {
@@ -110,7 +110,7 @@ export default enhance(CustomersScreenBase);
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
-  scrollView: { flex: 1 },
+  scrollView: { flex: 10 },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   card: { 
     flex: 0.2,

@@ -11,18 +11,18 @@ import { showToast } from '../../utils/utils';
 
 function ProductsScreenBase({ products }) {
   const navigation = useNavigation();
-  const isFocused = navigation.isFocused();
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editing, setEditing] = React.useState(null);
   const [productsList, setProductsList] = React.useState([]);
 
   React.useEffect(() => {
-    (async () => {
+    const unsubscribe = navigation.addListener('focus', async () => {
       const productsData = await database.collections.get('products').query().fetch();
       setProductsList([ ...productsData ]);
-    })();
-  }, [products, isFocused]);
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   React.useEffect(() => {
     (async () => {
@@ -102,7 +102,7 @@ const enhance = withObservables([], () => ({
 export default enhance(ProductsScreenBase);
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
-  scrollView: { flex: 1 },
+  scrollView: { flex: 10 },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   card: { 
     flex: 0.2,

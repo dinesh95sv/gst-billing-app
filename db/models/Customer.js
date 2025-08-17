@@ -10,6 +10,6 @@ export default class Customer extends Model {
   @field('phone') phone;        // optional
   @field('email') email;        // optional
   @field('gstin') gstin;
-  @readonly @date('created_at') createdAt
-  @readonly @date('updated_at') updatedAt
+  @readonly @date('created_at') createdAt;
+  @readonly @date('updated_at') updatedAt;
 }

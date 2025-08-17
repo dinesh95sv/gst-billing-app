@@ -9,6 +9,6 @@ export default class Factory extends Model {
   @field('address') address;    // optional
   @field('contact') contact;    // optional, e.g. phone or person
   @field('gstin') gstin;
-  @readonly @date('created_at') createdAt
-  @readonly @date('updated_at') updatedAt
+  @readonly @date('created_at') createdAt;
+  @readonly @date('updated_at') updatedAt;
 }

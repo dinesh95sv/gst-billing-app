@@ -12,18 +12,18 @@ import { showToast } from '../../utils/utils';
 // Base functional screen component
 function FactoriesScreenBase({ factories }) {
   const navigation = useNavigation();
-  const isFocused = navigation.isFocused();
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editingFactory, setEditingFactory] = React.useState(null);
 
   const [factoriesList, setFactoriesList] = React.useState([]);
 
   React.useEffect(() => {
-    (async () => {
+    const unsubscribe = navigation.addListener('focus', async () => {
       const factoryData = await database.collections.get('factories').query().fetch();
       setFactoriesList([ ...factoryData ]);
-    })();
-  }, [factories, isFocused]);
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   React.useEffect(() => {
     (async () => {
@@ -123,7 +123,7 @@ export default enhance(FactoriesScreenBase);
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
-  scrollView: { flex: 1 },
+  scrollView: { flex: 10 },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   card: { 
     flex: 0.2,
