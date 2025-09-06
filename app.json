@@ -29,14 +29,16 @@
       "expo-router",
       [
         "expo-splash-screen",
-        "expo-media-library",
         {
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "photosPermission": "Allow GST APP to access your photos.",
-          "savePhotosPermission": "Allow GST APP to save photos.",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-media-library",
+        {
           "isAccessMediaLocationEnabled": true
         }
       ]
