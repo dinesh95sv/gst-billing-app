@@ -1,8 +1,6 @@
 import { registerRootComponent } from 'expo';
-import * as MediaLibrary from 'expo-media-library';
 import { ExpoRoot } from 'expo-router';
 import { useEffect } from 'react';
-import { Platform } from 'react-native';
 import { database } from './db/database';
 
 // Must be exported or Fast Refresh won't update the context
@@ -10,19 +8,9 @@ export function App() {
   const ctx = require.context('./app');
   useEffect(() => {
     (async () => {
-      await requestStoragePermission();
       await initialiseDummyData();
     })();
   }, []);
-
-  const requestStoragePermission = async () => {
-    if (Platform.OS === 'android') {
-      const permission = await MediaLibrary.requestPermissionsAsync();
-      console.log(permission.granted
-        ? '✅ Storage permission granted' 
-        : '⚠️ Storage permission denied');
-    }
-  };
 
   const initialiseDummyData = async () => {
     const productsCollection = database.collections.get('products');
