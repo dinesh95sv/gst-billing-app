@@ -201,18 +201,23 @@ export default function InvoiceForm({ route }) {
             {items.length > 0 ? (<Text style={styles.label}>Items in Invoice:</Text>): null}
             {items.map(it => (
               <View key={it.productId} style={styles.itemRow}>
-                <View>
-                  <View style={{ flex: 0.6}}>
-                    <Text style={ styles.label }>{it.name}</Text>
+                <View style={{ flex: 1, flexDirection: 'row' }}>
+                  <View style={{ flex: 0.6, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <Text style={styles.label}>{it.name}</Text>
                   </View>
-                  <View style={{ flex: 0.4 }}>
-                    <Text>Qty:</Text>
-                    <TextInput
-                      style={styles.input}
-                      value={it.quantity.toFixed(0)}
-                      onChangeText={(v) => updateQuantity(it.productId, (parseInt(v) || 0))}
-                    />
-                    <Text>₹{it.total.toFixed(2)}</Text>
+                  <View style={{ flex: 0.4, flexDirection: 'column' }}>
+                    <View style={{ flex: 1, flexDirection: 'row' }}>
+                      <Text>Qty:</Text>
+                      <TextInput
+                        style={styles.input}
+                        value={it.quantity.toFixed(0)}
+                        onChangeText={(v) => updateQuantity(it.productId, (parseInt(v) || 0))}
+                      />
+                    </View>
+                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <Text>Total: </Text>
+                      <Text>₹{it.total.toFixed(2)}</Text>
+                    </View>
                   </View>
                 </View>
                 <View style={styles.btnContainer}>
@@ -257,7 +262,7 @@ const styles = StyleSheet.create({
   heading: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   label: { fontWeight: 'bold', marginTop: 10 },
   dropdown: { backgroundColor: '#edf4ff', borderWidth:1, borderColor:'#ccc'},
-  itemRow: { flex: 1, flexDirection: 'row' },
+  itemRow: { flex: 1, flexDirection: 'column' },
   input:{borderWidth:1,borderColor:'#807f7f',backgroundColor:'#edf4ff',color: '#000',marginBottom:10,padding:8,borderRadius:5},
   actions: { justifyContent: 'center', alignItems: 'center' },
   actionBtn: { paddingVertical: 4, paddingHorizontal: 8 },

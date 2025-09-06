@@ -35,41 +35,43 @@ function CustomersScreenBase({ customers }) {
           style="light"
           hidden={false}
         />
-        <ScrollView style={styles.scrollView}>
-          <Text style={styles.title}>Customer List</Text>
-          {customers.map(cust => (
-            <View key={cust.id} style={styles.card}>
-              <View style={styles.details}>
-                <Text style={styles.name}>{cust.name}</Text>
-                {cust.contact ? (
+        <View style={styles.scrollView}>
+          <Text style={styles.title}>Customers</Text>
+          <ScrollView>
+            {customers.map(cust => (
+              <View key={cust.id} style={styles.card}>
+                <View style={styles.details}>
+                  <Text style={styles.name}>{cust.name}</Text>
+                  {cust.contact ? (
+                    <TouchableOpacity 
+                      onPress={() => callMobile(cust.contact )}
+                    >
+                    <Text>{cust.contact}</Text>
+                  </TouchableOpacity>
+                  ) : null }
+                  <Text>GSTIN: {cust.gstin}</Text>
+                </View>
+                <View style={styles.actions}>
                   <TouchableOpacity 
-                    onPress={() => callMobile(cust.contact )}
+                    style={styles.actionBtn} 
+                    onPress={() => { setEditingCustomer(cust); setModalVisible(true); }}
                   >
-                  <Text>{cust.contact}</Text>
-                </TouchableOpacity>
-                ) : null }
-                <Text>GSTIN: {cust.gstin}</Text>
+                    {/* <Text style={styles.actionText}>Edit</Text> */}
+                    <Ionicons name="pencil" size={24} color="blue" />
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.actionBtn} 
+                    onPress={() => handleDelete(cust)}
+                  >
+                    {/* <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text> */}
+                    <Ionicons name="trash-bin" size={24} color="red" />
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.actions}>
-                <TouchableOpacity 
-                  style={styles.actionBtn} 
-                  onPress={() => { setEditingCustomer(cust); setModalVisible(true); }}
-                >
-                  {/* <Text style={styles.actionText}>Edit</Text> */}
-                  <Ionicons name="pencil" size={24} color="blue" />
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.actionBtn} 
-                  onPress={() => handleDelete(cust)}
-                >
-                  {/* <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text> */}
-                  <Ionicons name="trash-bin" size={24} color="red" />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
-          {/* <Button title="➕ Add Customer" onPress={() => { setEditingCustomer(null); setModalVisible(true); }} /> */}
-        </ScrollView>
+            ))}
+            {/* <Button title="➕ Add Customer" onPress={() => { setEditingCustomer(null); setModalVisible(true); }} /> */}
+          </ScrollView>
+        </View>
         <View style={styles.btnContainer}>
             <TouchableOpacity
               style={styles.btnPrimary} 

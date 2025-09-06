@@ -44,40 +44,42 @@ function FactoriesScreenBase({ factories }) {
           style="light"
           hidden={false}
         />
-        <ScrollView style={styles.scrollView}>
+        <View style={styles.scrollView}>
           <Text style={styles.title}>Factories</Text>
-          {factories.map(fac => (
-            <View key={fac.id} style={styles.card}>
-              <View style={styles.details}>
-                <Text style={styles.name}>{fac.name}</Text>
-                {fac.address ? <Text>{fac.address}</Text> : null}
-                {fac.contact ? <Text>Contact: {fac.contact}</Text> : null}
-                <Text>GSTIN: {fac.gstin}</Text>
+          <ScrollView>
+            {factories.map(fac => (
+              <View key={fac.id} style={styles.card}>
+                <View style={styles.details}>
+                  <Text style={styles.name}>{fac.name}</Text>
+                  {fac.address ? <Text>{fac.address}</Text> : null}
+                  {fac.contact ? <Text>Contact: {fac.contact}</Text> : null}
+                  <Text>GSTIN: {fac.gstin}</Text>
+                </View>
+                <View style={styles.actions}>
+                  <TouchableOpacity 
+                    style={styles.actionBtn} 
+                    onPress={() => { setEditingFactory(fac); setModalVisible(true); }}
+                  >
+                    {/* <Text style={styles.actionText}>Edit</Text> */}
+                    <Ionicons name="pencil" size={24} color="blue" />
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.actionBtn} 
+                    onPress={() => handleDelete(fac)}
+                  >
+                    {/* <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text> */}
+                    <Ionicons name="trash-bin" size={24} color="red" />
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.actions}>
-                <TouchableOpacity 
-                  style={styles.actionBtn} 
-                  onPress={() => { setEditingFactory(fac); setModalVisible(true); }}
-                >
-                  {/* <Text style={styles.actionText}>Edit</Text> */}
-                  <Ionicons name="pencil" size={24} color="blue" />
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.actionBtn} 
-                  onPress={() => handleDelete(fac)}
-                >
-                  {/* <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text> */}
-                  <Ionicons name="trash-bin" size={24} color="red" />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
+            ))}
 
-          {/* <Button 
-            title="➕ Add Factory" 
-            onPress={() => { setEditingFactory(null); setModalVisible(true); }} 
-          /> */}
-        </ScrollView>
+            {/* <Button 
+              title="➕ Add Factory" 
+              onPress={() => { setEditingFactory(null); setModalVisible(true); }} 
+            /> */}
+          </ScrollView>
+        </View>
         <View style={styles.btnContainer}>
           <TouchableOpacity
             style={styles.btnPrimary} 

@@ -36,35 +36,37 @@ function ProductsScreenBase({ products }) {
           style="light"
           hidden={false}
         />
-        <ScrollView style={styles.scrollView}>
+        <View style={styles.scrollView}>
           <Text style={styles.title}>Products</Text>
-          {products.map(prod => (
-            <View key={prod.id} style={styles.card}>
-              <View style={styles.details}>
-                <Text style={styles.name}>{prod.name}</Text>
-                <Text>HSN: {prod.hsn}</Text>
-                <Text>₹{prod.price} + {prod.gst_percent}% GST</Text>
+          <ScrollView>
+            {products.map(prod => (
+              <View key={prod.id} style={styles.card}>
+                <View style={styles.details}>
+                  <Text style={styles.name}>{prod.name}</Text>
+                  <Text>HSN: {prod.hsn}</Text>
+                  <Text>₹{prod.price} + {prod.gst_percent}% GST</Text>
+                </View>
+                <View style={styles.actions}>
+                  <TouchableOpacity 
+                    style={styles.actionBtn} 
+                    onPress={() => { setEditing(prod); setModalVisible(true); }}
+                  >
+                    {/* <Text style={styles.actionText}>Edit</Text> */}
+                    <Ionicons name="pencil" size={24} color="blue" />
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.actionBtn} 
+                    onPress={() => deleteProduct(prod)}
+                  >
+                    {/* <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text> */}
+                    <Ionicons name="trash-bin" size={24} color="red" />
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.actions}>
-                <TouchableOpacity 
-                  style={styles.actionBtn} 
-                  onPress={() => { setEditing(prod); setModalVisible(true); }}
-                >
-                  {/* <Text style={styles.actionText}>Edit</Text> */}
-                  <Ionicons name="pencil" size={24} color="blue" />
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.actionBtn} 
-                  onPress={() => deleteProduct(prod)}
-                >
-                  {/* <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text> */}
-                  <Ionicons name="trash-bin" size={24} color="red" />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
-          {/* <Button title="➕ Add Product" onPress={() => { setEditing(null); setModalVisible(true); }} /> */}
-        </ScrollView>
+            ))}
+            {/* <Button title="➕ Add Product" onPress={() => { setEditing(null); setModalVisible(true); }} /> */}
+          </ScrollView>
+        </View>
         <View style={styles.btnContainer}>
           <TouchableOpacity
             style={styles.btnPrimary} 
