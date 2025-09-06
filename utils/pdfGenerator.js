@@ -37,7 +37,7 @@ const ensureBillsDirectoryExists = async (directory) => {
 
         if (Platform.OS === 'android') {
             // Use the Downloads directory which is accessible
-            billsPath = `${directory}Invoice/`;
+            billsPath = `${directory}/Invoice/`;
         } else {
             // For iOS, use the app's document directory
             billsPath = `${FileSystem.documentDirectory}Invoice/`;
