@@ -58,8 +58,10 @@ export function App() {
           inv.date = dateStr;
           inv.customer_id = customer.id;
           inv.factory_id = factory.id;
-          inv.items_json = JSON.stringify([{ 
+          inv.items_json = JSON.stringify([{
+            productId: dateStr, 
             name: product.name, 
+            hsn: product.hsn,
             quantity: 2, 
             price: product.price, 
             gstPercent: product.gst_percent, 

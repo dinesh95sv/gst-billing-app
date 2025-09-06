@@ -16,15 +16,15 @@ export default class Invoice extends Model {
   @readonly @date('updated_at') updatedAt;
 
   // Optionally provide parsed items getter/setter
-  get items() {
-    try {
-      return JSON.parse(this.itemsJson);
-    } catch {
-      return [];
-    }
-  }
+  // get items() {
+  //   try {
+  //     return JSON.parse(this.itemsJson);
+  //   } catch {
+  //     return [];
+  //   }
+  // }
 
-  set items(itemsArray) {
-    this.itemsJson = JSON.stringify(itemsArray);
-  }
+  // set items(itemsArray) {
+  //   this.itemsJson = JSON.stringify(itemsArray);
+  // }
 }
