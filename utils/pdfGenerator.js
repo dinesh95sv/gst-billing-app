@@ -85,7 +85,7 @@ const savePDFToDevice = async (pdfUri, fileName) => {
 
     //   const finalPath = `${FileSystem.documentDirectory}${fileName}`
 
-      console.log('Start PDF Copy:', finalPath);
+      console.log('Start PDF Copy:', downloadPath);
       await FileSystem.StorageAccessFramework.copyAsync({
         from: pdfUri,
         to: downloadPath
@@ -99,7 +99,7 @@ const savePDFToDevice = async (pdfUri, fileName) => {
             await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
         }
 
-      console.log('PDF saved to:', finalPath);
+      console.log('PDF saved to:', downloadPath);
       
       // For Android, also try to save to external storage if possible
     //   if (Platform.OS === 'android') {
