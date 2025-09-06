@@ -61,12 +61,8 @@ const ensureBillsDirectoryExists = async (directory) => {
 const savePDFToDevice = async (pdfUri, fileName) => {
     try {
       const directory = await requestStoragePermission();
-      if (!directory) {
-        return null;
-      }
 
-      const billsPath = await ensureBillsDirectoryExists(directory);
-      const finalPath = `${billsPath}${fileName}`;
+      const finalPath = `${directory ? `${directory}/` : `${FileSystem.documentDirectory}`}${fileName}`;
       
       // Copy the PDF to the Bills directory
       await FileSystem.copyAsync({
@@ -87,13 +83,13 @@ const savePDFToDevice = async (pdfUri, fileName) => {
         // } else {
         // await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
         // }
-        const pdfBase64 = await FileSystem.readAsStringAsync(pdfUri, {encoding: FileSystem.EncodingType.Base64,});
-        await FileSystem.StorageAccessFramework.createFileAsync(billsPath, fileName, 'application/pdf')
-            .then(async (newFileUri) => {
-                await FileSystem.writeAsStringAsync(newFileUri, pdfBase64, {
-                encoding: FileSystem.EncodingType.Base64,
-                });
-            });
+        // const pdfBase64 = await FileSystem.readAsStringAsync(pdfUri, {encoding: FileSystem.EncodingType.Base64,});
+        await FileSystem.StorageAccessFramework.copyAsync({from: finalPath, to: `${directory}/${fileName}`});
+            // .then(async (newFileUri) => {
+            //     await FileSystem.writeAsStringAsync(newFileUri, pdfBase64, {
+            //     encoding: FileSystem.EncodingType.Base64,
+            //     });
+            // });
       }
       
       return finalPath;
