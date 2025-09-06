@@ -17,7 +17,8 @@ export function App() {
 
   const requestStoragePermission = async () => {
     if (Platform.OS === 'android') {
-      const permission = await FileSystem.StorageAccessFramework.requestPermissionsAsync();
+      const directory = FileSystem.StorageAccessFramework.getUriForDirectoryInRoot('Downloads');
+      const permission = await FileSystem.StorageAccessFramework.requestPermissionsAsync(directory);
       console.log(permission.granted
         ? '✅ Storage permission granted' 
         : '⚠️ Storage permission denied');

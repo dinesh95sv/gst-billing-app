@@ -1,7 +1,6 @@
 import * as FileSystem from 'expo-file-system';
-import * as MediaLibrary from 'expo-media-library';
 import * as Print from 'expo-print';
-import { Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { database } from '../db/database';
 import { showToast } from './utils';
 
@@ -14,7 +13,8 @@ import { showToast } from './utils';
 const requestStoragePermission = async () => {
     try {
         if (Platform.OS === 'android') {
-            const permission = await MediaLibrary.getPermissionsAsync();
+            const directory = FileSystem.StorageAccessFramework.getUriForDirectoryInRoot('Downloads');
+            const permission = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync(directory);
             if (!permission.granted) {
                 Alert.alert(
                     'Permission Required',
@@ -23,7 +23,7 @@ const requestStoragePermission = async () => {
                 );
                 return false;
             }
-            return true;
+            return permission.directoryUri;
         }
     } catch (error) {
         console.error('Permission error:', error);
@@ -61,23 +61,26 @@ const ensureBillsDirectoryExists = async (directory) => {
 
 const savePDFToDevice = async (pdfUri, fileName) => {
     try {
-      const permission = await requestStoragePermission();
+      const directory = await requestStoragePermission();
 
-      if (!permission) {
+      if (!directory) {
         return null;
       }
 
-      const asset = await MediaLibrary.createAssetAsync(pdfUri);
-      const album = await MediaLibrary.getAlbumAsync('Invoices');
-      if (album === null) {
-        await MediaLibrary.createAlbumAsync('Invoices', asset, false);
-      } else {
-        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
-      }
+      const finalPath = `${directory}/${fileName}`;
 
-      const finalPath = `${FileSystem.documentDirectory}${fileName}`
-      
-      await FileSystem.copyAsync({
+    //   const asset = await MediaLibrary.createAssetAsync(pdfUri);
+    //   const album = await MediaLibrary.getAlbumAsync('Invoices');
+    //   if (album === null) {
+    //     await MediaLibrary.createAlbumAsync('Invoices', asset, false);
+    //   } else {
+    //     await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+    //   }
+
+    //   const finalPath = `${FileSystem.documentDirectory}${fileName}`
+
+    console.log('Start PDF Copy:', finalPath);
+      await FileSystem.StorageAccessFramework.copyAsync({
         from: pdfUri,
         to: finalPath
       });
