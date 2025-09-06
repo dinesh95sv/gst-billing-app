@@ -1,4 +1,5 @@
 import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
 import * as Print from 'expo-print';
 import { Platform } from 'react-native';
 import { database } from '../db/database';
@@ -13,7 +14,7 @@ import { showToast } from './utils';
 const requestStoragePermission = async () => {
     try {
         if (Platform.OS === 'android') {
-            const permission = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+            const permission = await MediaLibrary.getPermissionsAsync();
             if (!permission.granted) {
                 Alert.alert(
                     'Permission Required',
@@ -22,7 +23,7 @@ const requestStoragePermission = async () => {
                 );
                 return false;
             }
-            return permission.directoryUri;
+            return true;
         }
     } catch (error) {
         console.error('Permission error:', error);
@@ -60,11 +61,22 @@ const ensureBillsDirectoryExists = async (directory) => {
 
 const savePDFToDevice = async (pdfUri, fileName) => {
     try {
-      const directory = await requestStoragePermission();
+      const permission = await requestStoragePermission();
 
-      const finalPath = `${directory ? `${directory}/` : `${FileSystem.documentDirectory}`}${fileName}`;
+      if (!permission) {
+        return null;
+      }
+
+      const asset = await MediaLibrary.createAssetAsync(pdfUri);
+      const album = await MediaLibrary.getAlbumAsync('Invoices');
+      if (album === null) {
+        await MediaLibrary.createAlbumAsync('Invoices', asset, false);
+      } else {
+        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+      }
+
+      const finalPath = `${FileSystem.documentDirectory}${fileName}`
       
-      // Copy the PDF to the Bills directory
       await FileSystem.copyAsync({
         from: pdfUri,
         to: finalPath
@@ -73,7 +85,7 @@ const savePDFToDevice = async (pdfUri, fileName) => {
       console.log('PDF saved to:', finalPath);
       
       // For Android, also try to save to external storage if possible
-      if (Platform.OS === 'android') {
+    //   if (Platform.OS === 'android') {
         // Create asset and add to media library
         // const asset = await MediaLibrary.createAssetAsync(finalPath);
         // const album = await MediaLibrary.getAlbumAsync('Invoice');
@@ -84,13 +96,13 @@ const savePDFToDevice = async (pdfUri, fileName) => {
         // await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
         // }
         // const pdfBase64 = await FileSystem.readAsStringAsync(pdfUri, {encoding: FileSystem.EncodingType.Base64,});
-        await FileSystem.StorageAccessFramework.copyAsync({from: finalPath, to: `${directory}/${fileName}`});
+        // await FileSystem.StorageAccessFramework.copyAsync({from: finalPath, to: `${directory}/${fileName}`});
             // .then(async (newFileUri) => {
             //     await FileSystem.writeAsStringAsync(newFileUri, pdfBase64, {
             //     encoding: FileSystem.EncodingType.Base64,
             //     });
             // });
-      }
+    //   }
       
       return finalPath;
     } catch (error) {
