@@ -1,4 +1,5 @@
 import { registerRootComponent } from 'expo';
+import * as MediaLibrary from 'expo-media-library';
 import { ExpoRoot } from 'expo-router';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
