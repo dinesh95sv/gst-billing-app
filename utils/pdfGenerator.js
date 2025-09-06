@@ -74,7 +74,7 @@ const savePDFToDevice = async (pdfUri, fileName) => {
         await FileSystem.makeDirectoryAsync(downloadDir, { intermediates: true });
       }
 
-      const downloadPath = `${downloadDir}${fileName}`;
+      const downloadPath = `${dirPath}${fileName}`;
     //   const asset = await MediaLibrary.createAssetAsync(pdfUri);
     //   const album = await MediaLibrary.getAlbumAsync('Invoices');
     //   if (album === null) {
