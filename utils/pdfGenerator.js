@@ -71,7 +71,7 @@ const savePDFToDevice = async (pdfUri, fileName) => {
 
       const downloadDirInfo = await FileSystem.getInfoAsync(dirPath);
       if (!downloadDirInfo.exists) {
-        await FileSystem.makeDirectoryAsync(downloadDir, { intermediates: true });
+        await FileSystem.makeDirectoryAsync(dirPath, { intermediates: true });
       }
 
       const downloadPath = `${dirPath}${fileName}`;
