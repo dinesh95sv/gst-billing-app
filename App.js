@@ -59,7 +59,7 @@ export function App() {
           inv.customer_id = customer.id;
           inv.factory_id = factory.id;
           inv.items_json = JSON.stringify([{
-            productId: dateStr, 
+            productId: product.id, 
             name: product.name, 
             hsn: product.hsn,
             quantity: 2, 

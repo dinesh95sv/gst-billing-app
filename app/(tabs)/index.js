@@ -22,10 +22,10 @@ export default function InvoiceForm({ route }) {
 
   const [refreshing, setRefreshing] = useState(false);
 
-  const [customerId, setCustomerId] = useState(existingInvoice?.customer_id || '');
-  const [factoryId, setFactoryId] = useState(existingInvoice?.factory_id || '');
-  const [date, setDate] = useState(existingInvoice?.date || new Date().toISOString().split('T')[0]);
-  const [items, setItems] = useState(existingInvoice ? JSON.parse(existingInvoice.items_json) : []);
+  const [customerId, setCustomerId] = useState('');
+  const [factoryId, setFactoryId] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [items, setItems] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -44,7 +44,7 @@ export default function InvoiceForm({ route }) {
           setCustomerId(invoiceDetail?.customer_id || '');
           setFactoryId(invoiceDetail?.factory_id || '');
           setDate(invoiceDetail?.date || new Date().toISOString().split('T')[0]);
-          setItems(invoiceDetail ? [ ...JSON.parse(invoiceDetail.items_json) ] : []);
+          setItems(invoiceDetail ? [ ...JSON.parse(invoiceDetail?.items_json || '[]') ] : []);
         } else {
           setCustomers(await database.collections.get('customers').query().fetch());
           setFactories(await database.collections.get('factories').query().fetch());
