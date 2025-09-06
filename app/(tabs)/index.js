@@ -69,7 +69,7 @@ export default function InvoiceForm({ route }) {
   }, []);
 
   const updateQuantity = (productId, qty) => {
-    if (qty !== 0) {
+    if (qty !== 0 && qty <= 100000) {
       setItems(items.map(it => it.productId === productId ? { ...it, quantity: qty, total: ((it.price * qty) + ((it.price * qty) * it.gstPercent / 100)) } : it));
     } else {
       setItems(items.map(it => it.productId === productId ? { ...it, quantity: 0, total: 0} : it));
@@ -198,39 +198,45 @@ export default function InvoiceForm({ route }) {
             </View>
 
             <View>
-            {items.length > 0 ? (<Text style={styles.label}>Items in Invoice:</Text>): null}
-            {items.map(it => (
-              <View key={it.productId} style={styles.itemRow}>
-                <View style={{ flex: 1, flexDirection: 'row' }}>
-                  <View style={{ flex: 0.6, alignItems: 'center', flexWrap: 'wrap' }}>
-                    <Text style={styles.label}>{it.name}</Text>
+              {items.length > 0 ? (<Text style={styles.label}>Items in Invoice:</Text>): null}
+              {items.map(it => (
+                <View key={it.productId} style={styles.itemRow}>
+                  <View style={{ flex: 1, flexDirection: 'row' }}>
+                    <View style={{ flex: 0.6, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <Text style={styles.label}>{it.name}</Text>
+                    </View>
+                    <View style={{ flex: 0.4, flexDirection: 'column' }}>
+                      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Text>Qty:</Text>
+                        <TextInput
+                          style={styles.input}
+                          value={it.quantity.toFixed(0)}
+                          onChangeText={(v) => updateQuantity(it.productId, (parseInt(v) || 0))}
+                        />
+                      </View>
+                      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text>Total: </Text>
+                        <Text>₹{it.total.toFixed(2)}</Text>
+                      </View>
+                    </View>
                   </View>
-                  <View style={{ flex: 0.4, flexDirection: 'column' }}>
-                    <View style={{ flex: 1, flexDirection: 'row' }}>
-                      <Text>Qty:</Text>
-                      <TextInput
-                        style={styles.input}
-                        value={it.quantity.toFixed(0)}
-                        onChangeText={(v) => updateQuantity(it.productId, (parseInt(v) || 0))}
-                      />
-                    </View>
-                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-                      <Text>Total: </Text>
-                      <Text>₹{it.total.toFixed(2)}</Text>
-                    </View>
+                  <View style={styles.btnContainer}>
+                    <TouchableOpacity
+                      style={styles.btnSecondary} 
+                      onPress={() => removeItem(it.productId)}
+                    >
+                      {/* <Text style={styles.label}>❌</Text> */}
+                      <Ionicons name="close-sharp" size={24} color="red" />
+                    </TouchableOpacity>
                   </View>
                 </View>
-                <View style={styles.btnContainer}>
-                  <TouchableOpacity
-                    style={styles.btnSecondary} 
-                    onPress={() => removeItem(it.productId)}
-                  >
-                    {/* <Text style={styles.label}>❌</Text> */}
-                    <Ionicons name="close-sharp" size={24} color="red" />
-                  </TouchableOpacity>
+              ))}
+              <View style={styles.itemRow}>
+                <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'flex-end' }}>
+                  <Text style={styles.label}>GST Total: ₹{items.reduce((acc, it) => acc + ((it.price * it.quantity) * it.gstPercent / 100), 0)}</Text>
+                  <Text style={styles.label}>Invoice Total: ₹{items.reduce((acc, it) => acc + it.total, 0)}</Text>
                 </View>
               </View>
-            ))}
             </View>
 
             <View style={styles.btnContainer}>
@@ -289,7 +295,7 @@ const styles = StyleSheet.create({
   },
   btnContainer: {
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'right'
   },
@@ -297,7 +303,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     backgroundColor: '#39e39f',
-    borderRadius: 25,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 8,

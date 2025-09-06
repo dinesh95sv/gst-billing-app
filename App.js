@@ -1,5 +1,5 @@
 import { registerRootComponent } from 'expo';
-import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system';
 import { ExpoRoot } from 'expo-router';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
@@ -17,8 +17,8 @@ export function App() {
 
   const requestStoragePermission = async () => {
     if (Platform.OS === 'android') {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      console.log(status === 'granted'
+      const permission = await FileSystem.StorageAccessFramework.requestPermissionsAsync();
+      console.log(permission.granted
         ? '✅ Storage permission granted' 
         : '⚠️ Storage permission denied');
     }
