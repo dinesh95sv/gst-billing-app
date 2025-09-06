@@ -15,7 +15,7 @@ export default function InvoiceForm({ route }) {
     const router = useRouter();
     const invoiceNumber = route?.params?.existingInvoice || null;
 
-  const [existingInvoice, setExistingInvoice] = useState({});
+  const [existingInvoice, setExistingInvoice] = useState(null);
   const [customers, setCustomers] = useState([]);
   const [factories, setFactories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -108,8 +108,8 @@ export default function InvoiceForm({ route }) {
       const total = items.reduce((acc, it) => acc + it.total, 0);
       // const invoiceNo = `INV-${Date.now().toString().slice(-6)}`;
       const newDate = new Date();
-      const monthNo = 1 + (newDate.getMonth() || 0);
       const year = newDate.getFullYear().toString();
+      const monthNo = newDate.getMonth() + 1;
       const month = monthNo.toString().padStart(2, "0");
       const date = newDate.getDate().toString().padStart(2, "0");
       const hrs = newDate.getHours().toString().padStart(2, "0");
@@ -117,7 +117,7 @@ export default function InvoiceForm({ route }) {
       const invoiceNo = `INV-${year}${month}${date}${hrs}${mins}`;
 
       await database.write(async () => {
-        if (existingInvoice) {
+        if (existingInvoice != null) {
           await existingInvoice.update(inv => {
             inv.invoice_number = existingInvoice.invoice_number;
             inv.date = date;

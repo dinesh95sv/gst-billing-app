@@ -73,35 +73,37 @@ function InvoicesScreenBase({ invoices }) {
           <Text style={styles.title}>Invoices</Text>
           {invoiceList.map(inv => (
             <View key={inv.id} style={styles.card}>
-              <View style={{ flex: 1 }}>
+              <View style={{ width: '100%' }}>
                 <Text style={styles.name}>{inv.invoice_number}</Text>
               </View>
-              <View style={styles.details}>
-                <Text>Date: {inv.date}</Text>
-                <Text>Total: ₹{inv.total.toFixed(2)}</Text>
-              </View>
-              <View style={styles.actions}>
-                <TouchableOpacity 
-                  style={styles.actionBtn} 
-                  onPress={() => shareInvoice(inv)}
-                >
-                  {/* <Text style={[styles.actionText, { color: 'green' }]}>Share</Text> */}
-                  <Ionicons name="share" size={24} color="green" />
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.actionBtn} 
-                  onPress={() => { redirectToCreateInvoice(inv.invoice_number) }}
-                >
-                  {/* <Text style={styles.actionText}>Edit</Text> */}
-                  <Ionicons name="pencil" size={24} color="blue" />
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.actionBtn} 
-                  onPress={() => deleteInvoice(inv)}
-                >
-                  {/* <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text> */}
-                  <Ionicons name="trash-bin" size={24} color="red" />
-                </TouchableOpacity>
+              <View style={{ width: '100%' }}>
+                <View style={styles.details}>
+                  <Text>Date: {inv.date}</Text>
+                  <Text>Total: ₹{inv.total.toFixed(2)}</Text>
+                </View>
+                <View style={styles.actions}>
+                  <TouchableOpacity 
+                    style={styles.actionBtn} 
+                    onPress={() => shareInvoice(inv)}
+                  >
+                    {/* <Text style={[styles.actionText, { color: 'green' }]}>Share</Text> */}
+                    <Ionicons name="share" size={24} color="green" />
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.actionBtn} 
+                    onPress={() => { redirectToCreateInvoice(inv.invoice_number) }}
+                  >
+                    {/* <Text style={styles.actionText}>Edit</Text> */}
+                    <Ionicons name="pencil" size={24} color="blue" />
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.actionBtn} 
+                    onPress={() => deleteInvoice(inv)}
+                  >
+                    {/* <Text style={[styles.actionText, { color: 'red' }]}>Delete</Text> */}
+                    <Ionicons name="trash-bin" size={24} color="red" />
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           ))}
