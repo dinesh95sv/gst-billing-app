@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { database } from '../db/database';
+import { showToast } from '../utils/utils';
 
 export default function CustomerForm({ existingCustomer, onClose }) {
   const [name, setName] = useState(existingCustomer?.name || '');
@@ -9,24 +10,30 @@ export default function CustomerForm({ existingCustomer, onClose }) {
   const [gstin, setGstin] = useState(existingCustomer?.gstin || '');
 
   const saveCustomer = async () => {
-    await database.write(async () => {
-      if (existingCustomer) {
-        await existingCustomer.update(f => {
-          f.name = name;
-          f.address = address;
-          f.contact = contact;
-          f.gstin = gstin;
-        });
-      } else {
-        await database.collections.get('customers').create(f => {
-          f.name = name;
-          f.address = address;
-          f.contact = contact;
-          f.gstin = gstin;
-        });
-      }
-    });
-    onClose();
+    try {
+      await database.write(async () => {
+        if (existingCustomer) {
+          await existingCustomer.update(f => {
+            f.name = name;
+            f.address = address;
+            f.contact = contact;
+            f.gstin = gstin;
+          });
+        } else {
+          await database.collections.get('customers').create(f => {
+            f.name = name;
+            f.address = address;
+            f.contact = contact;
+            f.gstin = gstin;
+          });
+        }
+      });
+      showToast('Customer Created Successfully!');
+      onClose();
+    } catch {
+      showToast('Failed to Create Customer!');
+    }
+    
   };
 
   return (
@@ -59,7 +66,7 @@ export default function CustomerForm({ existingCustomer, onClose }) {
   );
 }
 const styles = StyleSheet.create({
-  modalContainer:{flex: 1, padding:20, backgroundColor:'#80eded', color: '#000'},
+  modalContainer:{flex: 1, padding:20, backgroundColor:'#fff', color: '#000'},
   label: { fontWeight: 'bold', marginTop: 10, color: '#000' },
   input:{borderWidth:1,borderColor:'#807f7f',backgroundColor:'#edf4ff',color: '#000',marginBottom:10,padding:8,borderRadius:5},
   inputMultiline:{borderWidth:1,borderColor:'#807f7f',backgroundColor:'#edf4ff',color: '#000', textAlignVertical: 'top', marginBottom:10,padding:8,borderRadius:5},

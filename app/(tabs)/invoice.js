@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { withObservables } from '@nozbe/watermelondb/react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
@@ -39,7 +39,8 @@ function InvoicesScreenBase({ invoices }) {
       { text: 'Yes', style: 'destructive', onPress: async () => {
         try {
           await database.write(async () => { await invoice.destroyPermanently(); });
-        } catch (err) {
+          showToast('Invoice Deleted Successfully!');
+        } catch {
           showToast('Error Deleting Invoice!');
         }
       }}
@@ -53,9 +54,9 @@ function InvoicesScreenBase({ invoices }) {
     }
   };
 
-  const redirectToCreateInvoice = (inv) => {
-    if (inv != null) {
-      navigation.navigate('index', { existingInvoice: inv.invoice_number });
+  const redirectToCreateInvoice = (invoiceNo) => {
+    if (invoiceNo != null) {
+      navigation.navigate('index', { existingInvoice: invoiceNo });
     } else {
       navigation.navigate('index');
     }
@@ -124,7 +125,7 @@ const enhance = withObservables([], () => ({
 export default enhance(InvoicesScreenBase);
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
+  container: { flex: 1, padding: 12, backgroundColor: '#fff', color: '#000' },
   scrollView: { flex: 10 },
   title: { fontSize: 20, fontWeight: 'bold' },
   card: { 
@@ -134,7 +135,9 @@ const styles = StyleSheet.create({
     color: '#000',
     padding: 10, 
     marginVertical: 5, 
-    border: '.5px solid #ddd', 
+    borderWidth: 0.5,
+    borderColor: '#ddd',
+    borderStyle: 'solid', 
     borderRadius: 6 
   },
   details: { flex: 0.8 },

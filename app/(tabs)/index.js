@@ -8,6 +8,7 @@ import { RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } f
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
+import { showToast } from '../../utils/utils';
 
 export default function InvoiceForm({ route }) {
     const navigation = useNavigation();
@@ -37,7 +38,8 @@ export default function InvoiceForm({ route }) {
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
         if (invoiceNumber !== null) {
-          const invoiceDetail = await database.collections.get('invoices').query(Q.where('invoice_number', invoiceNumber)).fetch()[0] || null;
+          const invoiceResults = await database.collections.get('invoices').query(Q.where('invoice_number', invoiceNumber)).fetch();
+          const invoiceDetail = invoiceResults[0] || null
           setExistingInvoice(invoiceDetail);
           setCustomerId(invoiceDetail?.customer_id || '');
           setFactoryId(invoiceDetail?.factory_id || '');
@@ -101,42 +103,48 @@ export default function InvoiceForm({ route }) {
   };
 
   const saveInvoice = async () => {
-    const gstBreakup = items.reduce((acc, it) => acc + ((it.price * it.quantity) * it.gstPercent / 100), 0);
-    const total = items.reduce((acc, it) => acc + it.total, 0);
-    // const invoiceNo = `INV-${Date.now().toString().slice(-6)}`;
-    const newDate = new Date();
-    const monthNo = 1 + (newDate.getMonth() || 0);
-    const year = newDate.getFullYear().toString();
-    const month = monthNo.toString().padStart(2, "0");
-    const date = newDate.getDate().padStart(2, "0");
-    const hrs = newDate.getHours().toString().padStart(2, "0");
-    const mins = newDate.getMinutes().toString().padStart(2, "0");
-    const invoiceNo = `INV-${year}${month}${date}${hrs}${mins}`;
+    try {
+      const gstBreakup = items.reduce((acc, it) => acc + ((it.price * it.quantity) * it.gstPercent / 100), 0);
+      const total = items.reduce((acc, it) => acc + it.total, 0);
+      // const invoiceNo = `INV-${Date.now().toString().slice(-6)}`;
+      const newDate = new Date();
+      const monthNo = 1 + (newDate.getMonth() || 0);
+      const year = newDate.getFullYear().toString();
+      const month = monthNo.toString().padStart(2, "0");
+      const date = newDate.getDate().toString().padStart(2, "0");
+      const hrs = newDate.getHours().toString().padStart(2, "0");
+      const mins = newDate.getMinutes().toString().padStart(2, "0");
+      const invoiceNo = `INV-${year}${month}${date}${hrs}${mins}`;
 
-    await database.write(async () => {
-      if (existingInvoice) {
-        await existingInvoice.update(inv => {
-          inv.invoice_number = existingInvoice.invoice_number;
-          inv.date = date;
-          inv.customer_id = customerId;
-          inv.factory_id = factoryId;
-          inv.items_json = JSON.stringify(items);
-          inv.gst_breakup = gstBreakup;
-          inv.total = total;
-        });
-      } else {
-        await database.collections.get('invoices').create(inv => {
-          inv.invoice_number = invoiceNo;
-          inv.date = date;
-          inv.customer_id = customerId;
-          inv.factory_id = factoryId;
-          inv.items_json = JSON.stringify(items);
-          inv.gst_breakup = gstBreakup;
-          inv.total = total;
-        });
-      }
-    });
-    navigation.navigate('invoice');
+      await database.write(async () => {
+        if (existingInvoice) {
+          await existingInvoice.update(inv => {
+            inv.invoice_number = existingInvoice.invoice_number;
+            inv.date = date;
+            inv.customer_id = customerId;
+            inv.factory_id = factoryId;
+            inv.items_json = JSON.stringify(items);
+            inv.gst_breakup = gstBreakup;
+            inv.total = total;
+          });
+        } else {
+          await database.collections.get('invoices').create(inv => {
+            inv.invoice_number = invoiceNo;
+            inv.date = date;
+            inv.customer_id = customerId;
+            inv.factory_id = factoryId;
+            inv.items_json = JSON.stringify(items);
+            inv.gst_breakup = gstBreakup;
+            inv.total = total;
+          });
+        }
+      });
+      showToast(`Invoice ${existingInvoice != null ? 'Updated' : 'Created' } Successfully!`);
+      navigation.navigate('invoice');
+    } catch {
+      showToast(`Failed to ${existingInvoice != null ? 'Update' : 'Create' } Invoice!`);
+    }
+    
   };
 
   const onReset = () => {
@@ -243,7 +251,7 @@ export default function InvoiceForm({ route }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
+  container: { flex: 1, padding: 12, backgroundColor: '#fff', color: '#000' },
   scrollView: { flex: 1 },
   content: { flexDirection: 'column' },
   heading: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },

@@ -14,22 +14,6 @@ function ProductsScreenBase({ products }) {
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editing, setEditing] = React.useState(null);
-  const [productsList, setProductsList] = React.useState([]);
-
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', async () => {
-      const productsData = await database.collections.get('products').query().fetch();
-      setProductsList([ ...productsData ]);
-    });
-    return unsubscribe;
-  }, [navigation]);
-
-  React.useEffect(() => {
-    (async () => {
-      const productsData = await database.collections.get('products').query().fetch();
-      setProductsList([ ...productsData ]);
-    })();
-  }, []);
 
   const deleteProduct = async (product) => {
     Alert.alert('Delete?', 'Confirm delete product?', [
@@ -37,7 +21,8 @@ function ProductsScreenBase({ products }) {
       { text: 'Yes', style: 'destructive', onPress: async () => {
         try {
           await database.write(async () => { await product.destroyPermanently(); });
-        } catch (err) {
+          showToast('Product Deleted Successfully!');
+        } catch {
           showToast('Error Deleting Product!');
         }
       }}
@@ -53,7 +38,7 @@ function ProductsScreenBase({ products }) {
         />
         <ScrollView style={styles.scrollView}>
           <Text style={styles.title}>Products</Text>
-          {productsList.map(prod => (
+          {products.map(prod => (
             <View key={prod.id} style={styles.card}>
               <View style={styles.details}>
                 <Text style={styles.name}>{prod.name}</Text>
@@ -101,7 +86,7 @@ const enhance = withObservables([], () => ({
 }));
 export default enhance(ProductsScreenBase);
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
+  container: { flex: 1, padding: 12, backgroundColor: '#fff', color: '#000' },
   scrollView: { flex: 10 },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   card: { 
@@ -110,7 +95,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#f7f7f7', 
     padding: 10, 
     marginVertical: 5, 
-    border: '.5px solid #ddd', 
+    borderWidth: 0.5,
+    borderColor: '#ddd',
+    borderStyle: 'solid', 
     borderRadius: 6 
   },
   details: { flex: 0.8 },

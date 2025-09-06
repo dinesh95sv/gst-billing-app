@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { database } from '../db/database';
+import { showToast } from '../utils/utils';
 
 export default function ProductForm({ existingProduct, onClose }) {
   const [name, setName] = useState(existingProduct?.name || '');
@@ -9,24 +10,30 @@ export default function ProductForm({ existingProduct, onClose }) {
   const [gstPercent, setGstPercent] = useState(existingProduct?.gst_percent?.toString() || '');
 
   const saveProduct = async () => {
-    await database.write(async () => {
-      if (existingProduct) {
-        await existingProduct.update(p => {
-          p.name = name;
-          p.hsn = hsn;
-          p.price = parseFloat(price);
-          p.gst_percent = parseFloat(gstPercent);
-        });
-      } else {
-        await database.collections.get('products').create(p => {
-          p.name = name;
-          p.hsn = hsn;
-          p.price = parseFloat(price);
-          p.gst_percent = parseFloat(gstPercent);
-        });
-      }
-    });
-    onClose();
+    try {
+      await database.write(async () => {
+        if (existingProduct) {
+          await existingProduct.update(p => {
+            p.name = name;
+            p.hsn = hsn;
+            p.price = parseFloat(price);
+            p.gst_percent = parseFloat(gstPercent);
+          });
+        } else {
+          await database.collections.get('products').create(p => {
+            p.name = name;
+            p.hsn = hsn;
+            p.price = parseFloat(price);
+            p.gst_percent = parseFloat(gstPercent);
+          });
+        }
+      });
+      showToast('Product Saved Successfully!');
+      onClose();
+    } catch {
+      showToast('Error Saving Product!');
+    }
+    
   };
 
   return (
@@ -39,8 +46,6 @@ export default function ProductForm({ existingProduct, onClose }) {
       <TextInput placeholder="Price" inputMode="decimal" value={price} onChangeText={setPrice} style={styles.input} />
       <Text style={styles.label}>GST %</Text>
       <TextInput placeholder="GST %" inputMode="numeric" value={gstPercent} onChangeText={setGstPercent} style={styles.input} />
-      {/* <Button title="Save" onPress={saveProduct} />
-      <Button title="Cancel" onPress={onClose} color="grey" /> */}
       <View style={styles.btnContainer}>
         <TouchableOpacity
           style={styles.btnSecondary} 
@@ -59,7 +64,7 @@ export default function ProductForm({ existingProduct, onClose }) {
   );
 }
 const styles = StyleSheet.create({
-  modalContainer:{flex: 1, padding:20, backgroundColor:'#80eded', color: '#000'},
+  modalContainer:{flex: 1, padding:20, backgroundColor:'#fff', color: '#000'},
   label: { fontWeight: 'bold', marginTop: 10, color: '#000' },
   input:{borderWidth:1,borderColor:'#807f7f',backgroundColor:'#edf4ff',color: '#000',marginBottom:10,padding:8,borderRadius:5},
   btnContainer: { flex: 1, flexDirection: 'row' ,alignItems: 'flex-end', justifyContent: 'right' },

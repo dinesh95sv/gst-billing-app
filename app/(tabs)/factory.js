@@ -15,23 +15,6 @@ function FactoriesScreenBase({ factories }) {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editingFactory, setEditingFactory] = React.useState(null);
 
-  const [factoriesList, setFactoriesList] = React.useState([]);
-
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', async () => {
-      const factoryData = await database.collections.get('factories').query().fetch();
-      setFactoriesList([ ...factoryData ]);
-    });
-    return unsubscribe;
-  }, [navigation]);
-
-  React.useEffect(() => {
-    (async () => {
-      const factoryData = await database.collections.get('factories').query().fetch();
-      setFactoriesList([ ...factoryData ]);
-    })();
-  }, []);
-
   const handleDelete = (factory) => {
     Alert.alert(
       'Delete Factory?',
@@ -44,7 +27,8 @@ function FactoriesScreenBase({ factories }) {
           onPress: async () => {
             try {
               await database.write(async () => { await factory.destroyPermanently(); });
-            } catch (err) {
+              showToast('Factory Deleted Successfully!');
+            } catch {
               showToast('Error Deleting Factory!');
             }
           }
@@ -62,7 +46,7 @@ function FactoriesScreenBase({ factories }) {
         />
         <ScrollView style={styles.scrollView}>
           <Text style={styles.title}>Factories</Text>
-          {factoriesList.map(fac => (
+          {factories.map(fac => (
             <View key={fac.id} style={styles.card}>
               <View style={styles.details}>
                 <Text style={styles.name}>{fac.name}</Text>
@@ -122,7 +106,7 @@ const enhance = withObservables([], () => ({
 export default enhance(FactoriesScreenBase);
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
+  container: { flex: 1, padding: 12, backgroundColor: '#fff', color: '#000' },
   scrollView: { flex: 10 },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   card: { 
@@ -130,8 +114,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#f7f7f7', 
     padding: 10, 
-    marginVertical: 5, 
-    border: '.5px solid #ddd', 
+    marginVertical: 5,
+    borderWidth: 0.5,
+    borderColor: '#ddd',
+    borderStyle: 'solid',  
     borderRadius: 6 
   },
   details: { flex: 0.8 },

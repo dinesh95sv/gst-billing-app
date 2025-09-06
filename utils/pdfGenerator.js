@@ -3,6 +3,7 @@ import * as MediaLibrary from 'expo-media-library';
 import * as Print from 'expo-print';
 import { Platform } from 'react-native';
 import { database } from '../db/database';
+import { showToast } from './utils';
 
 /**
  * Generates a PDF for a given WatermelonDB invoice model.
@@ -78,21 +79,14 @@ const savePDFToDevice = async (pdfUri, fileName) => {
       
       // For Android, also try to save to external storage if possible
       if (Platform.OS === 'android') {
-        try {
-          // Create asset and add to media library
-          const asset = await MediaLibrary.createAssetAsync(finalPath);
-          const album = await MediaLibrary.getAlbumAsync('Invoice');
-          
-          if (album == null) {
-            await MediaLibrary.createAlbumAsync('Invoice', asset, false);
-          } else {
-            await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
-          }
-          
-          console.log('PDF also saved to device gallery/downloads');
-        } catch (mediaError) {
-          console.log('Could not save to media library:', mediaError.message);
-          // This is not critical, the file is still saved in app directory
+        // Create asset and add to media library
+        const asset = await MediaLibrary.createAssetAsync(finalPath);
+        const album = await MediaLibrary.getAlbumAsync('Invoice');
+        
+        if (album == null) {
+        await MediaLibrary.createAlbumAsync('Invoice', asset, false);
+        } else {
+        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
         }
       }
       
@@ -250,7 +244,7 @@ export async function generateInvoicePDF(invoice) {
       return savedPath;
     } catch (error) {
         console.error('Error generating PDF:', error);
-        Alert.alert('Error', 'Failed to generate invoice PDF: ' + error.message);
+        showToast('Error! Failed to generate invoice PDF.');
     }
 
     return null; // return failure

@@ -14,30 +14,14 @@ function CustomersScreenBase({ customers }) {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editingCustomer, setEditingCustomer] = React.useState(null);
 
-  const [customersList, setCustomersList] = React.useState([]);
-
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', async () => {
-      const customerData = await database.collections.get('customers').query().fetch();
-      setCustomersList([ ...customerData ]);
-    });
-    return unsubscribe;
-  }, [navigation]);
-
-  React.useEffect(() => {
-    (async () => {
-      const customerData = await database.collections.get('customers').query().fetch();
-      setCustomersList([ ...customerData ]);
-    })();
-  }, []);
-
   const handleDelete = (customer) => {
     Alert.alert('Delete Customer?', 'Are you sure you want to delete this customer?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Yes', style: 'destructive', onPress: async () => {
         try {
           await database.write(async () => { await customer.destroyPermanently(); });
-        } catch (err) {
+          showToast('Customer Deleted Successfully!');
+        } catch {
           showToast('Error Deleting Customer!');
         }
       }}
@@ -53,7 +37,7 @@ function CustomersScreenBase({ customers }) {
         />
         <ScrollView style={styles.scrollView}>
           <Text style={styles.title}>Customer List</Text>
-          {customersList.map(cust => (
+          {customers.map(cust => (
             <View key={cust.id} style={styles.card}>
               <View style={styles.details}>
                 <Text style={styles.name}>{cust.name}</Text>
@@ -109,7 +93,7 @@ const enhance = withObservables([], () => ({
 export default enhance(CustomersScreenBase);
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 12, backgroundColor: '#80eded', color: '#000' },
+  container: { flex: 1, padding: 12, backgroundColor: '#fff', color: '#000' },
   scrollView: { flex: 10 },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   card: { 
@@ -118,7 +102,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#f7f7f7', 
     padding: 10, 
     marginVertical: 5, 
-    border: '.5px solid #ddd', 
+    borderWidth: 0.5,
+    borderColor: '#ddd',
+    borderStyle: 'solid', 
     borderRadius: 6 
   },
   details: { flex: 0.8 },
