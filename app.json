@@ -34,6 +34,12 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        },
+        "expo-media-library",
+        {
+          "photosPermission": "Allow GST APP to access your photos.",
+          "savePhotosPermission": "Allow GST APP to save photos.",
+          "isAccessMediaLocationEnabled": true
         }
       ]
     ],

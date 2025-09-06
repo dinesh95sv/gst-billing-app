@@ -13,9 +13,8 @@ import { showToast } from './utils';
 const requestStoragePermission = async () => {
     try {
         if (Platform.OS === 'android') {
-            const directory = FileSystem.StorageAccessFramework.getUriForDirectoryInRoot('Downloads');
-            const permission = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync(directory);
-            if (!permission.granted) {
+            const { status } = await MediaLibrary.requestPermissionsAsync();
+            if (status !== 'granted') {
                 Alert.alert(
                     'Permission Required',
                     'Storage permission is required to save invoices to your device.',
@@ -23,7 +22,7 @@ const requestStoragePermission = async () => {
                 );
                 return false;
             }
-            return permission.directoryUri;
+            return true;
         }
     } catch (error) {
         console.error('Permission error:', error);
@@ -61,14 +60,20 @@ const ensureBillsDirectoryExists = async (directory) => {
 
 const savePDFToDevice = async (pdfUri, fileName) => {
     try {
-      const directory = await requestStoragePermission();
+      const permission = await requestStoragePermission();
 
-      if (!directory) {
+      if (!permission) {
         return null;
       }
 
-      const finalPath = `${directory}/${fileName}`;
+      const dirPath = `${FileSystem.documentDirectory}Download/`;
 
+      const downloadDirInfo = await FileSystem.getInfoAsync(dirPath);
+      if (!downloadDirInfo.exists) {
+        await FileSystem.makeDirectoryAsync(downloadDir, { intermediates: true });
+      }
+
+      const downloadPath = `${downloadDir}${fileName}`;
     //   const asset = await MediaLibrary.createAssetAsync(pdfUri);
     //   const album = await MediaLibrary.getAlbumAsync('Invoices');
     //   if (album === null) {
@@ -79,11 +84,19 @@ const savePDFToDevice = async (pdfUri, fileName) => {
 
     //   const finalPath = `${FileSystem.documentDirectory}${fileName}`
 
-    console.log('Start PDF Copy:', finalPath);
+      console.log('Start PDF Copy:', finalPath);
       await FileSystem.StorageAccessFramework.copyAsync({
         from: pdfUri,
-        to: finalPath
+        to: downloadPath
       });
+
+        const asset = await MediaLibrary.createAssetAsync(downloadPath);
+        const album = await MediaLibrary.getAlbumAsync('Download');
+        if (album == null) {
+            await MediaLibrary.createAlbumAsync('Download', asset, false);
+        } else {
+            await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+        }
 
       console.log('PDF saved to:', finalPath);
       
@@ -107,7 +120,7 @@ const savePDFToDevice = async (pdfUri, fileName) => {
             // });
     //   }
       
-      return finalPath;
+      return downloadPath;
     } catch (error) {
       console.error('Error saving PDF to device:', error);
       Alert.alert('Error', 'Failed to save PDF to device storage');
