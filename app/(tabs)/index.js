@@ -97,7 +97,7 @@ function InvoiceForm({ customers, factories, products, route }) {
       const total = items.reduce((acc, it) => acc + it.total, 0);
       // const invoiceNo = `INV-${Date.now().toString().slice(-6)}`;
       const newDate = new Date();
-      const formattedDate = newDate.toISOString.split('T')[0].split('-').reverse().join('-');
+      const formattedDate = new Date().toISOString.split('T')[0].split('-').reverse().join('-');
       const hrs = newDate.getHours().toString().padStart(2, "0");
       const mins = newDate.getMinutes().toString().padStart(2, "0");
       const invoiceNo = `INV-${formattedDate}${hrs}${mins}`;
