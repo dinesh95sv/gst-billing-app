@@ -3,7 +3,6 @@ import { withObservables } from '@nozbe/watermelondb/react';
 import { useNavigation } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
@@ -12,26 +11,6 @@ import { showToast } from '../../utils/utils';
 
 function InvoicesScreenBase({ invoices }) {
   const navigation = useNavigation();
-  
-
-  // const [modalVisible, setModalVisible] = React.useState(false);
-  // const [editing, setEditing] = React.useState(null);
-  const [invoiceList, setInvoicesList] = React.useState([]);
-
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', async () => {
-      const invoiceData = await database.collections.get('invoices').query().fetch();
-      setInvoicesList([ ...invoiceData ]);
-    });
-    return unsubscribe;
-  }, [navigation]);
-
-  React.useEffect(() => {
-    (async () => {
-      const invoiceData = await database.collections.get('invoices').query().fetch();
-      setInvoicesList([ ...invoiceData ]);
-    })();
-  }, []);
 
   const deleteInvoice = async (invoice) => {
     Alert.alert('Delete Invoice?', 'Are you sure?', [
@@ -56,7 +35,7 @@ function InvoicesScreenBase({ invoices }) {
 
   const redirectToCreateInvoice = (invoiceNo) => {
     if (invoiceNo != null) {
-      navigation.navigate('index', { existingInvoice: invoiceNo });
+      navigation.navigate('index', { invoiceNumber: invoiceNo });
     } else {
       navigation.navigate('index');
     }
@@ -72,7 +51,7 @@ function InvoicesScreenBase({ invoices }) {
         <View  style={styles.scrollView}>
           <Text style={styles.title}>Invoices</Text>
           <ScrollView>
-            {invoiceList.map(inv => (
+            {invoices.map(inv => (
               <View key={inv.id} style={styles.card}>
                 <View style={{ width: '100%' }}>
                   <Text style={styles.name}>{inv.invoice_number}</Text>

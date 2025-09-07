@@ -3,70 +3,42 @@ import { Q } from '@nozbe/watermelondb';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useCallback, useEffect, useState } from 'react';
-import { RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
 import { showToast } from '../../utils/utils';
 
-export default function InvoiceForm({ route }) {
+function InvoiceForm({ customers, factories, products, route }) {
     const navigation = useNavigation();
     const router = useRouter();
-    const invoiceNumber = route?.params?.existingInvoice || null;
+    const invoiceNumber = route?.params?.invoiceNumber || null;
 
   const [existingInvoice, setExistingInvoice] = useState(null);
-  const [customers, setCustomers] = useState([]);
-  const [factories, setFactories] = useState([]);
-  const [products, setProducts] = useState([]);
-
-  const [refreshing, setRefreshing] = useState(false);
 
   const [customerId, setCustomerId] = useState('');
   const [factoryId, setFactoryId] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [items, setItems] = useState([]);
 
-  useEffect(() => {
-    (async () => {
-      setCustomers(await database.collections.get('customers').query().fetch());
-      setFactories(await database.collections.get('factories').query().fetch());
-      setProducts(await database.collections.get('products').query().fetch());
-    })();
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', async () => {
-        if (invoiceNumber !== null) {
-          const invoiceResults = await database.collections.get('invoices').query(Q.where('invoice_number', invoiceNumber)).fetch();
-          const invoiceDetail = invoiceResults[0] || null
-          setExistingInvoice(invoiceDetail);
-          setCustomerId(invoiceDetail?.customer_id || '');
-          setFactoryId(invoiceDetail?.factory_id || '');
-          setDate(invoiceDetail?.date || new Date().toISOString().split('T')[0]);
-          setItems(invoiceDetail ? [ ...JSON.parse(invoiceDetail?.items_json || '[]') ] : []);
-        } else {
-          setCustomers(await database.collections.get('customers').query().fetch());
-          setFactories(await database.collections.get('factories').query().fetch());
-          setProducts(await database.collections.get('products').query().fetch());
-        };
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    const loadData = async () => {
-      setCustomers(await database.collections.get('customers').query().fetch());
-      setFactories(await database.collections.get('factories').query().fetch());
-      setProducts(await database.collections.get('products').query().fetch());
+  useEffect(async () => {
+    try {
+      if (invoiceNumber !== null) {
+        const invoiceResults = await database.collections.get('invoices').query(Q.where('invoice_number', invoiceNumber)).fetch();
+        const invoiceDetail = invoiceResults[0] || null
+        setExistingInvoice(invoiceDetail);
+        setCustomerId(invoiceDetail?.customer_id || '');
+        setFactoryId(invoiceDetail?.factory_id || '');
+        setDate(invoiceDetail?.date || new Date().toISOString().split('T')[0]);
+        setItems(invoiceDetail ? [ ...JSON.parse(invoiceDetail?.items_json || '[]') ] : []);
+      }
+    } catch {
+      console.log('Error Fetching Invoice');
+      showToast('Error Fetching Invoice');
     }
-    loadData();
-    setTimeout(() => {
-    setRefreshing(false);
-    }, 500);
-  }, []);
+      
+  }, [invoiceNumber]);
 
   const updateQuantity = (productId, qty) => {
     if (qty <= 1000000) { // Only allow upto 10 Lakh Quantity.
@@ -174,12 +146,7 @@ export default function InvoiceForm({ route }) {
           style="dark"
           hidden={false}
         />
-        <ScrollView
-          style={styles.scrollView}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        >
+        <ScrollView style={styles.scrollView}>
           <View style={styles.content}>
             <View>
               <Text style={styles.label}>Customer</Text>
@@ -272,6 +239,13 @@ export default function InvoiceForm({ route }) {
     </SafeAreaProvider>
   );
 }
+
+const enhance = withObservables([], () => ({
+  customers: database.collections.get('customers').query().observe(),
+  factories: database.collections.get('factories').query().observe(),
+  products: database.collections.get('products').query().observe()
+}));
+export default enhance(InvoiceForm);
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 12, backgroundColor: '#fff', color: '#000' },
