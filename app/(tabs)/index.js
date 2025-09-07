@@ -20,25 +20,30 @@ function InvoiceForm({ customers, factories, products, route }) {
 
   const [customerId, setCustomerId] = useState('');
   const [factoryId, setFactoryId] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0].split('-').reverse().split('-'));
   const [items, setItems] = useState([]);
 
-  useEffect(async () => {
+  const getInvoiceDetails = async () => {
     try {
-      if (invoiceNumber !== null) {
-        const invoiceResults = await database.collections.get('invoices').query(Q.where('invoice_number', invoiceNumber)).fetch();
-        const invoiceDetail = invoiceResults[0] || null
-        setExistingInvoice(invoiceDetail);
+      const invoiceResults = await database.collections.get('invoices').query(Q.where('invoice_number', invoiceNumber)).fetch();
+      const invoiceDetail = invoiceResults[0] || null
+      setExistingInvoice(invoiceDetail);
+      if (invoiceDetail !== null) {
         setCustomerId(invoiceDetail?.customer_id || '');
         setFactoryId(invoiceDetail?.factory_id || '');
-        setDate(invoiceDetail?.date || new Date().toISOString().split('T')[0]);
+        setDate(invoiceDetail?.date || new Date().toISOString().split('T')[0].split('-').reverse().split('-'));
         setItems(invoiceDetail ? [ ...JSON.parse(invoiceDetail?.items_json || '[]') ] : []);
       }
     } catch {
       console.log('Error Fetching Invoice');
       showToast('Error Fetching Invoice');
     }
-      
+  };
+
+  useEffect(() => {
+    if (invoiceNumber !== null) {
+      getInvoiceDetails();
+    }
   }, [invoiceNumber]);
 
   const updateQuantity = (productId, qty) => {
@@ -241,10 +246,11 @@ function InvoiceForm({ customers, factories, products, route }) {
   );
 }
 
-const enhance = withObservables([], () => ({
+const enhance = withObservables([], ({ route }) => ({
   customers: database.collections.get('customers').query().observe(),
   factories: database.collections.get('factories').query().observe(),
-  products: database.collections.get('products').query().observe()
+  products: database.collections.get('products').query().observe(),
+  route
 }));
 export default enhance(InvoiceForm);
 
