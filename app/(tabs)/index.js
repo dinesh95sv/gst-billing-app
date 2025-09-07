@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Q } from '@nozbe/watermelondb';
 import { Picker } from '@react-native-picker/picker';
-import { useNavigation, useRouter } from 'expo-router';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -10,11 +10,9 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
 import { showToast } from '../../utils/utils';
 
-const InvoiceForm = () => {
-    const navigation = useNavigation();
-    const router = useRouter();
-
-    const invoiceNumber = router?.params?.invoiceNumber;
+export default function InvoiceForm() {
+    const navigation = useNavigation(); 
+    const { invoiceNumber } = useLocalSearchParams();
 
   const [existingInvoice, setExistingInvoice] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -24,28 +22,18 @@ const InvoiceForm = () => {
 
   const [customerId, setCustomerId] = useState('');
   const [factoryId, setFactoryId] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0].split('-').reverse().split('-'));
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0].split('-').reverse().join('-'));
   const [items, setItems] = useState([]);
 
-    useEffect(() => {
-    const loadData = async () => {
-      const  recFactoriesData = await database.get('factories').query().fetch();
-      const  recCustomersData = await database.get('customers').query().fetch();
-      const  recProductsData = await database.get('products').query().fetch();
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', async () => {
+      const  recFactoriesData = await database.get('factories').query().fetch() || [];
+      const  recCustomersData = await database.get('customers').query().fetch() || [];
+      const  recProductsData = await database.get('products').query().fetch() || [];
 
       setFactories(recFactoriesData);
       setCustomers(recCustomersData);
       setProducts(recProductsData);
-    }
-    loadData();
-
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', async () => {
-      setCustomers(await database.collections.get('customers').query().fetch());
-      setFactories(await database.collections.get('factories').query().fetch());
-      setProducts(await database.collections.get('products').query().fetch());
     });
 
     return unsubscribe;
@@ -72,7 +60,7 @@ const InvoiceForm = () => {
       if (invoiceDetail !== null) {
         setCustomerId(invoiceDetail?.customer_id || '');
         setFactoryId(invoiceDetail?.factory_id || '');
-        setDate(invoiceDetail?.date || new Date().toISOString().split('T')[0].split('-').reverse().split('-'));
+        setDate(invoiceDetail?.date || new Date().toISOString().split('T')[0].split('-').reverse().join('-'));
         setItems(invoiceDetail ? [ ...JSON.parse(invoiceDetail?.items_json || '[]') ] : []);
       }
     } catch {
@@ -82,7 +70,7 @@ const InvoiceForm = () => {
   };
 
   useEffect(() => {
-    if (invoiceNumber !== null) {
+    if (invoiceNumber !== undefined) {
       getInvoiceDetails();
     }
   }, [invoiceNumber]);
@@ -142,7 +130,7 @@ const InvoiceForm = () => {
       const total = items.reduce((acc, it) => acc + it.total, 0);
       // const invoiceNo = `INV-${Date.now().toString().slice(-6)}`;
       const newDate = new Date();
-      const formattedDate = new Date().toISOString.split('T')[0].split('-').reverse().join('-');
+      const formattedDate = new Date().toISOString().split('T')[0].split('-').reverse().join('-');
        const year = newDate.getFullYear().toString();
       const monthNo = newDate.getMonth() + 1;
       const month = monthNo.toString().padStart(2, "0");
@@ -300,7 +288,6 @@ const InvoiceForm = () => {
 //   factories: database.collections.get('factories').query().observe(),
 //   products: database.collections.get('products').query().observe(),
 // }));
-export default InvoiceForm;
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 12, backgroundColor: '#fff', color: '#000' },
