@@ -11,11 +11,11 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
 import { showToast } from '../../utils/utils';
 
-function InvoiceForm({ customers, factories, products, route }) {
+function InvoiceForm({ customers, factories, products }) {
     const navigation = useNavigation();
-    const router = useRouter();
-    const invoiceNumber = route?.params?.invoiceNumber || null;
+    const route = useRouter();
 
+  const [invoiceNumber, setInvoiceNumber] = useState(null);
   const [existingInvoice, setExistingInvoice] = useState(null);
 
   const [customerId, setCustomerId] = useState('');
@@ -45,6 +45,10 @@ function InvoiceForm({ customers, factories, products, route }) {
       getInvoiceDetails();
     }
   }, [invoiceNumber]);
+
+  useEffect(() => {
+    setInvoiceNumber(route.params.invoiceNumber || null);
+  }, [route]);
 
   const updateQuantity = (productId, qty) => {
     if (qty <= 1000000) { // Only allow upto 10 Lakh Quantity.
@@ -103,9 +107,13 @@ function InvoiceForm({ customers, factories, products, route }) {
       // const invoiceNo = `INV-${Date.now().toString().slice(-6)}`;
       const newDate = new Date();
       const formattedDate = new Date().toISOString.split('T')[0].split('-').reverse().join('-');
+       const year = newDate.getFullYear().toString();
+      const monthNo = newDate.getMonth() + 1;
+      const month = monthNo.toString().padStart(2, "0");
+      const dateStr = newDate.getDate().toString().padStart(2, "0");
       const hrs = newDate.getHours().toString().padStart(2, "0");
       const mins = newDate.getMinutes().toString().padStart(2, "0");
-      const invoiceNo = `INV-${formattedDate}${hrs}${mins}`;
+      const invoiceNo = `INV-${year}${month}${dateStr}${hrs}${mins}`;
 
       await database.write(async () => {
         if (existingInvoice != null) {
@@ -246,11 +254,10 @@ function InvoiceForm({ customers, factories, products, route }) {
   );
 }
 
-const enhance = withObservables([], ({ route }) => ({
+const enhance = withObservables([], () => ({
   customers: database.collections.get('customers').query().observe(),
   factories: database.collections.get('factories').query().observe(),
   products: database.collections.get('products').query().observe(),
-  route
 }));
 export default enhance(InvoiceForm);
 
