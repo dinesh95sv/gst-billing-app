@@ -32,7 +32,7 @@ function CustomersScreenBase({ customers }) {
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <StatusBar
-          style="light"
+          style="dark"
           hidden={false}
         />
         <View style={styles.scrollView}>

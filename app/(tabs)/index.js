@@ -69,10 +69,26 @@ export default function InvoiceForm({ route }) {
   }, []);
 
   const updateQuantity = (productId, qty) => {
-    if (qty !== 0 && qty <= 100000) {
-      setItems(items.map(it => it.productId === productId ? { ...it, quantity: qty, total: ((it.price * qty) + ((it.price * qty) * it.gstPercent / 100)) } : it));
-    } else {
-      setItems(items.map(it => it.productId === productId ? { ...it, quantity: 0, total: 0} : it));
+    if (qty <= 1000000) { // Only allow upto 10 Lakh Quantity.
+      if (qty !== 0) {
+        setItems(items.map(it => it.productId === productId 
+          ? { 
+              ...it,
+              quantity: qty,
+              total: ((it.price * qty) + ((it.price * qty) * it.gstPercent / 100))
+            } 
+          : it
+        ));
+      } else {
+        setItems(items.map(it => it.productId === productId 
+          ? { 
+              ...it, 
+              quantity: 0, 
+              total: 0
+            } 
+          : it
+        ));
+      }
     }
   };
 
@@ -108,19 +124,16 @@ export default function InvoiceForm({ route }) {
       const total = items.reduce((acc, it) => acc + it.total, 0);
       // const invoiceNo = `INV-${Date.now().toString().slice(-6)}`;
       const newDate = new Date();
-      const year = newDate.getFullYear().toString();
-      const monthNo = newDate.getMonth() + 1;
-      const month = monthNo.toString().padStart(2, "0");
-      const date = newDate.getDate().toString().padStart(2, "0");
+      const formattedDate = newDate.toISOString.split('T')[0].split('-').reverse().join('-');
       const hrs = newDate.getHours().toString().padStart(2, "0");
       const mins = newDate.getMinutes().toString().padStart(2, "0");
-      const invoiceNo = `INV-${year}${month}${date}${hrs}${mins}`;
+      const invoiceNo = `INV-${formattedDate}${hrs}${mins}`;
 
       await database.write(async () => {
         if (existingInvoice != null) {
           await existingInvoice.update(inv => {
             inv.invoice_number = existingInvoice.invoice_number;
-            inv.date = date;
+            inv.date = formattedDate;
             inv.customer_id = customerId;
             inv.factory_id = factoryId;
             inv.items_json = JSON.stringify(items);
@@ -130,7 +143,7 @@ export default function InvoiceForm({ route }) {
         } else {
           await database.collections.get('invoices').create(inv => {
             inv.invoice_number = invoiceNo;
-            inv.date = date;
+            inv.date = formattedDate;
             inv.customer_id = customerId;
             inv.factory_id = factoryId;
             inv.items_json = JSON.stringify(items);
@@ -150,7 +163,7 @@ export default function InvoiceForm({ route }) {
   const onReset = () => {
     setCustomerId(existingInvoice?.customer_id || '');
     setFactoryId(existingInvoice?.factory_id || '');
-    setDate(existingInvoice?.date || new Date().toISOString().split('T')[0]);
+    setDate(existingInvoice?.date || new Date().toISOString().split('T')[0].split('-').reverse().join('-'));
     setItems(existingInvoice ? JSON.parse(existingInvoice.items_json) : []);
   }
 
@@ -158,7 +171,7 @@ export default function InvoiceForm({ route }) {
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <StatusBar
-          style="light"
+          style="dark"
           hidden={false}
         />
         <ScrollView
@@ -225,14 +238,13 @@ export default function InvoiceForm({ route }) {
                       style={styles.btnSecondary} 
                       onPress={() => removeItem(it.productId)}
                     >
-                      {/* <Text style={styles.label}>❌</Text> */}
                       <Ionicons name="close-sharp" size={24} color="red" />
                     </TouchableOpacity>
                   </View>
                 </View>
               ))}
               <View style={styles.itemRow}>
-                <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'flex-end' }}>
+                <View style={{ flex: 1, justifyContent: 'flex-end' }}>
                   <Text style={styles.label}>GST Total: ₹{items.reduce((acc, it) => acc + ((it.price * it.quantity) * it.gstPercent / 100), 0)}</Text>
                   <Text style={styles.label}>Invoice Total: ₹{items.reduce((acc, it) => acc + it.total, 0)}</Text>
                 </View>
@@ -267,7 +279,7 @@ const styles = StyleSheet.create({
   content: { flexDirection: 'column' },
   heading: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
   label: { fontWeight: 'bold', marginTop: 10 },
-  dropdown: { backgroundColor: '#edf4ff', borderWidth:1, borderColor:'#ccc'},
+  dropdown: { backgroundColor: '#edf4ff', borderWidth:1, borderColor:'#807f7f', color: '#000' },
   itemRow: { flex: 1, flexDirection: 'column' },
   input:{borderWidth:1,borderColor:'#807f7f',backgroundColor:'#edf4ff',color: '#000',marginBottom:10,padding:8,borderRadius:5},
   actions: { justifyContent: 'center', alignItems: 'center' },
@@ -296,8 +308,8 @@ const styles = StyleSheet.create({
   btnContainer: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'right'
+    alignItems: 'center',
+    justifyContent: 'flex-end'
   },
   btnPrimary: {
     paddingVertical: 12,
