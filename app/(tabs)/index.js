@@ -11,9 +11,9 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
 import { showToast } from '../../utils/utils';
 
-function InvoiceForm({ customers, factories, products }) {
+const InvoiceForm = ({ customers, factories, products }) => {
     const navigation = useNavigation();
-    const route = useRouter();
+    const router = useRouter();
 
   const [invoiceNumber, setInvoiceNumber] = useState(null);
   const [existingInvoice, setExistingInvoice] = useState(null);
@@ -47,8 +47,8 @@ function InvoiceForm({ customers, factories, products }) {
   }, [invoiceNumber]);
 
   useEffect(() => {
-    setInvoiceNumber(route.params.invoiceNumber || null);
-  }, [route]);
+    setInvoiceNumber(router?.params?.invoiceNumber || null);
+  }, [router]);
 
   const updateQuantity = (productId, qty) => {
     if (qty <= 1000000) { // Only allow upto 10 Lakh Quantity.
