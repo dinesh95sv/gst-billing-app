@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Q } from '@nozbe/watermelondb';
 import { Picker } from '@react-native-picker/picker';
-import { useNavigation } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -10,10 +10,12 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { database } from '../../db/database';
 import { showToast } from '../../utils/utils';
 
-const InvoiceForm = ({ route }) => {
+const InvoiceForm = () => {
     const navigation = useNavigation();
+    const router = useRouter();
 
-  const [invoiceNumber, setInvoiceNumber] = useState(null);
+    const invoiceNumber = router?.params?.invoiceNumber;
+
   const [existingInvoice, setExistingInvoice] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [customers, setCustomers] = useState([]);
@@ -84,10 +86,6 @@ const InvoiceForm = ({ route }) => {
       getInvoiceDetails();
     }
   }, [invoiceNumber]);
-
-  useEffect(() => {
-    setInvoiceNumber(route?.params?.invoiceNumber || null);
-  }, [route]);
 
   const updateQuantity = (productId, qty) => {
     if (qty <= 1000000) { // Only allow upto 10 Lakh Quantity.
